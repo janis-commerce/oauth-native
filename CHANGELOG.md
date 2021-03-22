@@ -10,3 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - initial react native code
 - react-native-builder-bob installation and config
+- eslint prettier
+- jest plugins and configuration files
+- husky and lint-staged
