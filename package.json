@@ -1,7 +1,6 @@
 {
   "name": "@janiscommerce/oauth-native",
   "version": "0.0.1",
-  "private": true,
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
   "react-native": "src/index.js",
@@ -13,7 +12,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "test": "jest",
+    "test": "jest --colors --c jestApp.config.json --bail --findRelatedTests",
+    "test:coverage": "jest --collectCoverage",
     "lint": "eslint .",
     "prepare": "bob build"
   },
@@ -26,11 +26,22 @@
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",
     "babel-jest": "^25.1.0",
-    "eslint": "^6.5.1",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.59.0",
     "react-native-builder-bob": "^0.18.1",
-    "react-test-renderer": "16.13.1"
+    "react-test-renderer": "16.13.1",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1"
   },
   "jest": {
     "preset": "react-native"
@@ -47,5 +58,19 @@
       ],
       "module"
     ]
+  },
+  "lint-staged": {
+    "*.{js, jsx json}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{js, jsx}": [
+      "npm run test"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
