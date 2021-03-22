@@ -1,9 +1,6 @@
 {
   "preset": "react-native",
   "roots": ["<rootDir>"],
-  "moduleNameMapper": {
-    "env.json": "<rootDir>/mocks/env.json"
-  },
   "verbose": true,
   "moduleDirectories": ["node_modules", "src"],
   "clearMocks": true,

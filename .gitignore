@@ -60,3 +60,6 @@ buck-out/
 
 # react-native-builder-bob
 /lib
+
+#coverage
+coverage
