@@ -6,6 +6,7 @@
   "clearMocks": true,
   "moduleFileExtensions": ["js", "jsx", "json"],
   "testMatch": ["**/__tests__/**/*.js?(x)", "**/?(*.)+(spec|test).js?(x)"],
+  "setupFilesAfterEnv": ["./jest.setup.js"],
   "coverageReporters": ["html", "text"],
   "coverageDirectory": "coverage",
   "collectCoverageFrom": [
