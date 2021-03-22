@@ -1,3 +1,1 @@
-export const myFunction = () => {
-  console.log('test');
-};
+export const myFunction = () => true;
