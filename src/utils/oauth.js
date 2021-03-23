@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {refresh} from 'react-native-app-auth';
+import {refresh, authorize} from 'react-native-app-auth';
 import keys from '../keys';
 import {parseJson, stringifyJson} from './json';
 
@@ -89,5 +89,27 @@ export const refreshAuthToken = async (refreshToken = '', config = {}) => {
     return newAuthState;
   } catch (error) {
     return Promise.reject(error);
+  }
+};
+
+/**
+ * @name userAuthorize
+ * @description - function to initialize user authorization flow
+ * @param {object} config - object with react-native-app-auth package config
+ * @returns {promise} - resolves with user tokens
+ */
+export const userAuthorize = async (config = {}) => {
+  try {
+    if (!config || !Object.keys(config).length)
+      throw new Error('config param is required');
+
+    const authState = await authorize(config);
+
+    storeTokensCache(authState);
+
+    return authState;
+  } catch (reason) {
+    console.log('userAuthorize error', reason);
+    return Promise.reject(reason);
   }
 };
