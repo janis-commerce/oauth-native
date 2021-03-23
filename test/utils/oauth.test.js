@@ -1,8 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {storeTokensCache, parseExpirationDate} from '../../src/utils/oauth';
+import {
+  storeTokensCache,
+  parseExpirationDate,
+  getTokensCache,
+} from '../../src/utils/oauth';
 import keys from '../../src/keys';
 
 describe('OAuth Utils', () => {
+  beforeEach(() => {
+    AsyncStorage.clear();
+  });
+
   describe('parseExpirationDate', () => {
     it('must parse string date to miliseconds number', () => {
       const stringDate = 'Mon Mar 22 2021 19:50:19 GMT-0300';
@@ -50,6 +58,39 @@ describe('OAuth Utils', () => {
       } catch (error) {
         expect(error).not.toBeUndefined();
       }
+    });
+  });
+
+  describe('getTokensCache', () => {
+    it('must get tokens data from async storage', async () => {
+      AsyncStorage.setItem(keys.OAUTH_TOKENS_KEY, JSON.stringify({a: 1, b: 2}));
+      AsyncStorage.setItem(
+        keys.OAUTH_TOKENS_EXPIRATION_KEY,
+        JSON.stringify(12341234),
+      );
+
+      const res = await getTokensCache();
+
+      expect(res).toEqual({
+        expiration: '12341234',
+        oauthTokens: {
+          a: 1,
+          b: 2,
+        },
+      });
+
+      expect(AsyncStorage.getItem).toBeCalledWith(keys.OAUTH_TOKENS_KEY);
+      expect(AsyncStorage.getItem).toBeCalledWith(
+        keys.OAUTH_TOKENS_EXPIRATION_KEY,
+      );
+    });
+
+    it('must return null tokens and expiration if there is nothing on async storage', async () => {
+      const expected = {expiration: null, oauthTokens: null};
+
+      const res = await getTokensCache();
+
+      expect(res).toEqual(expected);
     });
   });
 });

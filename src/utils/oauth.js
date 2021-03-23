@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../keys';
+import {parseJson, stringifyJson} from './json';
 // import {authorize, refresh} from 'react-native-app-auth';
 
 /**
@@ -32,16 +33,34 @@ export const storeTokensCache = async (oauthTokens) => {
 
     await AsyncStorage.setItem(
       keys.OAUTH_TOKENS_KEY,
-      JSON.stringify(oauthTokens),
+      stringifyJson(oauthTokens),
     );
 
     await AsyncStorage.setItem(
       keys.OAUTH_TOKENS_EXPIRATION_KEY,
-      JSON.stringify(expiration),
+      stringifyJson(expiration),
     );
 
     return true;
   } catch (error) {
     return Promise.reject(error);
   }
+};
+
+/**
+ * @name getTokensCache
+ * @description - get user tokens from local device memory (async storage)
+ * @private
+ * @returns {promise} - resolve an object with tokens data and expiration
+ */
+export const getTokensCache = async () => {
+  const res = await AsyncStorage.getItem(keys.OAUTH_TOKENS_KEY);
+
+  const expiration = await AsyncStorage.getItem(
+    keys.OAUTH_TOKENS_EXPIRATION_KEY,
+  );
+
+  const oauthTokens = parseJson(res);
+
+  return {oauthTokens, expiration};
 };
