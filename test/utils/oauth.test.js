@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {refresh} from 'react-native-app-auth';
 import {
   storeTokensCache,
   parseExpirationDate,
   getTokensCache,
+  refreshAuthToken,
 } from '../../src/utils/oauth';
 import keys from '../../src/keys';
 
@@ -91,6 +93,40 @@ describe('OAuth Utils', () => {
       const res = await getTokensCache();
 
       expect(res).toEqual(expected);
+    });
+  });
+
+  describe('refreshAuthToken', () => {
+    it('must call "refresh" fn with params from package', () => {
+      const config = {
+        issuer: 'https://app.example.com',
+        clientId: 'c1e2e8d5-ccea-47aa-9075-f9741fe11452',
+        redirectUrl: 'example/callback',
+        scopes: ['openid', 'profile', 'email', 'offline_access'],
+        serviceConfiguration: {
+          authorizationEndpoint: 'https://app.example.com/oauth/authorize',
+          tokenEndpoint: 'https://app.example.com/2.0/token',
+        },
+      };
+
+      refreshAuthToken('refresh-token-1', config);
+      expect(refresh).toBeCalledWith(config, {refreshToken: 'refresh-token-1'});
+    });
+
+    it('must catch error if refreshToken param is undefined', async () => {
+      try {
+        await refreshAuthToken(undefined, {a: 1, b: 2});
+      } catch (error) {
+        expect(error).not.toBeUndefined();
+      }
+    });
+
+    it('must catch error if config param is undefined', async () => {
+      try {
+        await refreshAuthToken('refresh-token-1', undefined);
+      } catch (error) {
+        expect(error).not.toBeUndefined();
+      }
     });
   });
 });

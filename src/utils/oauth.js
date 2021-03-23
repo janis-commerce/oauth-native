@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {refresh} from 'react-native-app-auth';
 import keys from '../keys';
 import {parseJson, stringifyJson} from './json';
-// import {authorize, refresh} from 'react-native-app-auth';
 
 /**
  * @name parseExpirationDate
@@ -63,4 +63,31 @@ export const getTokensCache = async () => {
   const oauthTokens = parseJson(res);
 
   return {oauthTokens, expiration};
+};
+
+/**
+ * @name refreshAuthToken
+ * @description function to get new valid token from refresh token
+ * @private
+ * @param {string} refreshToken
+ * @param {object} config - object with react-native-app-auth package config
+ * @returns {promise} resolves with new valid tokens
+ */
+export const refreshAuthToken = async (refreshToken = '', config = {}) => {
+  try {
+    if (!refreshToken) throw new Error('refreshToken param is required');
+
+    if (!config || !Object.keys(config).length)
+      throw new Error('config param is required');
+
+    const newAuthState = await refresh(config, {
+      refreshToken,
+    });
+
+    storeTokensCache(newAuthState);
+
+    return newAuthState;
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
