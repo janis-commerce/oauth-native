@@ -9,6 +9,7 @@ import {
   userAuthorize,
   getAuthData,
   getLoginObj,
+  clearAuthorizeTokens,
 } from '../../src/utils/oauth';
 import keys from '../../src/keys';
 
@@ -303,6 +304,33 @@ describe('OAuth Utils', () => {
       } catch (e) {
         console.error('e', e);
       }
+    });
+  });
+
+  describe('clearAuthorizeTokens', () => {
+    it('must clear async storage expiration and tokens keys', async () => {
+      await clearAuthorizeTokens();
+
+      expect(AsyncStorage.removeItem).toBeCalledWith(keys.OAUTH_TOKENS_KEY);
+      expect(AsyncStorage.removeItem).toBeCalledWith(
+        keys.OAUTH_TOKENS_EXPIRATION_KEY,
+      );
+    });
+
+    it('must return true if data was cleared', async () => {
+      const res = await clearAuthorizeTokens();
+
+      expect(res).toBeTruthy();
+    });
+
+    it('must return false', async () => {
+      jest.spyOn(AsyncStorage, 'removeItem').mockImplementation(() => {
+        throw new Error();
+      });
+
+      const res = await clearAuthorizeTokens();
+
+      expect(res).toBeFalsy();
     });
   });
 });

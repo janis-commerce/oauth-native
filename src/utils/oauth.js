@@ -162,3 +162,20 @@ export const getAuthData = async (config = {}) => {
     return getLoginObj();
   }
 };
+
+/**
+ * @name clearAuthorizeTokens
+ * @description - clear user tokens from async storage
+ * @private
+ * @returns {boolean} - true if tokens was cleared, false if some error has ocurred
+ */
+export const clearAuthorizeTokens = async () => {
+  try {
+    await AsyncStorage.removeItem(keys.OAUTH_TOKENS_KEY);
+    await AsyncStorage.removeItem(keys.OAUTH_TOKENS_EXPIRATION_KEY);
+
+    return true;
+  } catch (reason) {
+    return false;
+  }
+};
