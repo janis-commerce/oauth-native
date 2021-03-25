@@ -3,9 +3,12 @@ import {refresh, authorize} from 'react-native-app-auth';
 import {
   storeTokensCache,
   parseExpirationDate,
+  isExpired,
   getTokensCache,
   refreshAuthToken,
   userAuthorize,
+  getAuthData,
+  getLoginObj,
 } from '../../src/utils/oauth';
 import keys from '../../src/keys';
 
@@ -20,6 +23,20 @@ describe('OAuth Utils', () => {
       const expectedMiliseconds = 1616453419000;
 
       expect(parseExpirationDate(stringDate)).toBe(expectedMiliseconds);
+    });
+  });
+
+  describe('isExpired', () => {
+    it('must return true if date in params is not valid number or undefined', () => {
+      expect(isExpired()).toBeTruthy();
+    });
+
+    it('must return true if date in params is expired', () => {
+      expect(isExpired(Date.now() - 500)).toBeTruthy();
+    });
+
+    it('must return false if date in params is not expired', () => {
+      expect(isExpired(Date.now() + 500)).toBeFalsy();
     });
   });
 
@@ -153,6 +170,138 @@ describe('OAuth Utils', () => {
         await userAuthorize();
       } catch (error) {
         expect(error).not.toBeUndefined();
+      }
+    });
+  });
+
+  describe('getLoginObj', () => {
+    it('must return object with login data', () => {
+      const date = new Date(Date.now()).toDateString();
+      const tokensMock = {
+        accessTokenExpirationDate: date,
+        tokenType: 'Bearer',
+        expiresIn: 172799,
+        scope: 'openid profile email oms:order:read',
+        accessToken: 'access-token-1',
+        idToken: 'id-token-1',
+      };
+
+      const loginData = getLoginObj(tokensMock);
+
+      expect(loginData).toEqual({
+        isLogged: true,
+        oauthTokens: tokensMock,
+      });
+    });
+
+    it('must return object with login false and null tokens data', () => {
+      const loginData = getLoginObj();
+
+      expect(loginData).toEqual({
+        isLogged: false,
+        oauthTokens: null,
+      });
+    });
+  });
+
+  describe('getAuthData', () => {
+    it(`must return object with no logged user and null tokens if there is not tokens saved in async storage`, async () => {
+      const res = await getAuthData();
+      expect(res).toEqual({
+        isLogged: false,
+        oauthTokens: null,
+      });
+    });
+
+    it('must return object with isLogged boolean and oauthTokens', async () => {
+      try {
+        const date = new Date(Date.now() - 50000).toDateString();
+
+        await storeTokensCache({
+          accessTokenExpirationDate: date,
+          tokenType: 'Bearer',
+          expiresIn: 172799,
+          scope: 'openid profile email oms:order:read',
+          accessToken: 'access-token-1',
+          idToken: 'id-token-1',
+        });
+
+        const res = await getAuthData();
+
+        expect(res).toEqual({
+          isLogged: true,
+          oauthTokens: {
+            accessTokenExpirationDate: date,
+            tokenType: 'Bearer',
+            expiresIn: 172799,
+            scope: 'openid profile email oms:order:read',
+            accessToken: 'access-token-1',
+            idToken: 'id-token-1',
+          },
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    it('must return object with isLogged false and null tokens data', async () => {
+      const date = new Date(Date.now() - 50000).toDateString();
+
+      await storeTokensCache({
+        accessTokenExpirationDate: date,
+        tokenType: 'Bearer',
+        expiresIn: 172799,
+        scope: 'openid profile email oms:order:read',
+        refreshToken: 'refresh-token-1',
+        accessToken: 'access-token-1',
+        idToken: 'id-token-1',
+      });
+
+      const res = await getAuthData();
+
+      try {
+        expect(res).toEqual({
+          isLogged: false,
+          oauthTokens: null,
+        });
+      } catch (e) {
+        console.error('e', e);
+      }
+    });
+
+    it('must return object with isLogged false and null tokens data', async () => {
+      const config = {
+        issuer: 'https://app.example.com',
+        clientId: 'c1e2e8d5-ccea-47aa-9075-f9741fe11452',
+        redirectUrl: 'example/callback',
+        scopes: ['openid', 'profile', 'email', 'offline_access'],
+        serviceConfiguration: {
+          authorizationEndpoint: 'https://app.example.com/oauth/authorize',
+          tokenEndpoint: 'https://app.example.com/2.0/token',
+        },
+      };
+
+      const date = new Date(Date.now() - 50000).toDateString();
+
+      await storeTokensCache({
+        accessTokenExpirationDate: date,
+        tokenType: 'Bearer',
+        expiresIn: 172799,
+        scope: 'openid profile email oms:order:read',
+        refreshToken: 'refresh-token-1',
+        accessToken: 'access-token-1',
+        idToken: 'id-token-1',
+      });
+
+      const res = await getAuthData(config);
+
+      try {
+        expect(res).toEqual({
+          isLogged: false,
+          oauthTokens: null,
+        });
+      } catch (e) {
+        console.error('e', e);
       }
     });
   });

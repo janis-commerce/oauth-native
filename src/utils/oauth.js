@@ -11,9 +11,22 @@ import {parseJson, stringifyJson} from './json';
  * @returns {number} miliseconds
  */
 export const parseExpirationDate = (expirationDate) => {
-  if (!expirationDate || typeof expirationDate !== 'string') return null;
+  if (!expirationDate) return null;
 
   return Date.parse(expirationDate);
+};
+
+/**
+ * @name isExpired
+ * @description - function to verify a expiration date
+ * @private
+ * @param {string|number} expiration - expiration number in hours
+ * @returns {boolean} - true if is expired
+ */
+export const isExpired = (expiration) => {
+  if (!expiration || Number.isNaN(Number(expiration))) return true;
+
+  return Date.now() >= Number(expiration);
 };
 
 /**
@@ -95,6 +108,7 @@ export const refreshAuthToken = async (refreshToken = '', config = {}) => {
 /**
  * @name userAuthorize
  * @description - function to initialize user authorization flow
+ * @private
  * @param {object} config - object with react-native-app-auth package config
  * @returns {promise} - resolves with user tokens
  */
@@ -109,7 +123,42 @@ export const userAuthorize = async (config = {}) => {
 
     return authState;
   } catch (reason) {
-    console.log('userAuthorize error', reason);
     return Promise.reject(reason);
+  }
+};
+
+/**
+ * @name getLoginObj
+ * @description - get login obj info
+ * @private
+ * @param {object} tokens - oauth tokens
+ * @returns {object} - object with user login data
+ */
+export const getLoginObj = (tokens) => ({
+  isLogged: !!tokens,
+  oauthTokens: tokens || null,
+});
+
+/**
+ * @name getAuthData
+ * @description - function to get user tokens
+ * @private
+ * @returns {object} - object with user authorization/login tokens
+ */
+export const getAuthData = async (config = {}) => {
+  try {
+    const {oauthTokens, expiration} = await getTokensCache();
+
+    const {refreshToken = ''} = oauthTokens || {};
+
+    if (refreshToken && isExpired(expiration)) {
+      const newTokens = await refreshAuthToken(refreshToken, config);
+
+      return getLoginObj(newTokens);
+    }
+
+    return getLoginObj(oauthTokens);
+  } catch (error) {
+    return getLoginObj();
   }
 };
