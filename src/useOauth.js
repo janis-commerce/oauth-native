@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import {useState, useEffect} from 'react';
 import jwtDecode from 'jwt-decode';
 import {userAuthorize, clearAuthorizeTokens, getAuthData} from './utils/oauth';
@@ -6,6 +5,22 @@ import {logout} from './utils/browser';
 
 import {asyncWrap} from './utils/promises';
 
+/**
+ * @name useOauth
+ * @description custom hook to handle OAuth
+ * @private
+ * @returns {object} states and functions to handle oauth
+ * @example
+ * const myComponent() {
+ *    const {oauthTokens, userData, handleLogout, handleAuthorize, loading, error} = useOauth();
+ *
+ *    render(
+ *      <View>
+ *           <Text>user data: {userData}</Text>
+ *      </View>
+ *    )
+ * }
+ */
 const useOauth = () => {
   const initialAuthData = {isLogged: false, oauthTokens: null};
 
@@ -67,7 +82,7 @@ const useOauth = () => {
   useEffect(() => {
     if (!authData.oauthTokens) return;
 
-    const {idToken = ''} = authData.oauthTokens || {};
+    const {idToken = ''} = authData.oauthTokens;
 
     const decoded = jwtDecode(idToken);
 
