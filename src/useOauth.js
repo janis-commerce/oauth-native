@@ -21,7 +21,7 @@ import {asyncWrap} from './utils/promises';
  *    )
  * }
  */
-const useOauth = () => {
+const useOauth = (config = {}) => {
   const initialAuthData = {isLogged: false, oauthTokens: null};
 
   const [authData, setAuthData] = useState(initialAuthData);
@@ -29,8 +29,13 @@ const useOauth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  /**
+   * @name handleAuthorize
+   * @description method to trigger authentication process from react-native-app-auth package
+   * @public
+   */
   const handleAuthorize = async () => {
-    const [, apiError] = await asyncWrap(userAuthorize());
+    const [, apiError] = await asyncWrap(userAuthorize(config));
 
     if (apiError) {
       const {data = {}} = apiError.response || {};
@@ -41,16 +46,21 @@ const useOauth = () => {
       return;
     }
 
-    const authDataRes = await getAuthData();
+    const authDataRes = await getAuthData(config);
 
     setAuthData(authDataRes);
   };
 
-  const handleLogout = async () => {
+  /**
+   * @name handleLogout
+   * @description method to logout an user
+   * @public
+   */
+  const handleLogout = async (logoutUrl = '') => {
     setLoading(true);
 
     try {
-      await logout();
+      await logout(logoutUrl);
       await clearAuthorizeTokens();
       setAuthData(initialAuthData);
       setLoading(false);
@@ -64,7 +74,7 @@ const useOauth = () => {
     const validateLogin = async () => {
       setLoading(true);
 
-      const res = await getAuthData();
+      const res = await getAuthData(config);
 
       if (!res.isLogged) {
         await handleAuthorize();
