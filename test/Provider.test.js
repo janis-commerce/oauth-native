@@ -8,7 +8,9 @@ jest.mock('../src/useOauth', () => jest.fn());
 
 describe('AuthProvider', () => {
   it('renders correctly and calls useOauth hook', () => {
-    renderer.create(<AuthProvider />);
+    renderer.create(
+      <AuthProvider config={{clientId: '', redirectUrl: '', scopes: []}} />,
+    );
 
     expect(useOauth).toBeCalled();
   });

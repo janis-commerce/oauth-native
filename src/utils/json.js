@@ -23,7 +23,9 @@ export const parseJson = (json) => {
  * @returns {object} - json string
  */
 export const stringifyJson = (obj) => {
-  if (!obj || typeof obj !== 'object') return '';
+  if (!obj) return '';
+
+  if (typeof obj === 'string') return obj;
 
   return JSON.stringify(obj);
 };

@@ -25,7 +25,11 @@ describe('JSON utils', () => {
     });
 
     it('must return empty string if obj param is not defined or is not an object', () => {
-      expect(stringifyJson(123)).toBe('');
+      expect(stringifyJson(123)).toBe('123');
+    });
+
+    it('must return same string if obj param is a string yet', () => {
+      expect(stringifyJson('asd')).toBe('asd');
     });
   });
 });

@@ -1,4 +1,5 @@
 import React from 'react';
+import {string, shape, arrayOf} from 'prop-types';
 import useOauth from './useOauth';
 import {AuthContext} from './context';
 
@@ -15,10 +16,30 @@ import {AuthContext} from './context';
  *    )
  * }
  */
-const AuthProvider = (props) => {
-  const oauth = useOauth();
+const AuthProvider = ({logoutUrl, config, ...rest}) => {
+  const oauth = useOauth(config, logoutUrl);
 
-  return <AuthContext.Provider {...props} value={oauth} />;
+  return <AuthContext.Provider logoutUrl={logoutUrl} {...rest} value={oauth} />;
+};
+
+AuthProvider.propTypes = {
+  /**
+   * config to use in react-native-app-auth package
+   */
+  config: shape({
+    issuer: string,
+    clientId: string.isRequired,
+    redirectUrl: string.isRequired,
+    scopes: arrayOf(string).isRequired,
+  }).isRequired,
+  /**
+   * Url to open in app browser to logout user
+   */
+  logoutUrl: string,
+};
+
+AuthProvider.defaultProps = {
+  logoutUrl: '',
 };
 
 export default AuthProvider;

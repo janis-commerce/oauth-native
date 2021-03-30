@@ -21,7 +21,9 @@ import {asyncWrap} from './utils/promises';
  *    )
  * }
  */
-const useOauth = (config = {}) => {
+const useOauth = (config = {}, logoutUrl = '') => {
+  let mounted = true;
+
   const initialAuthData = {isLogged: false, oauthTokens: null};
 
   const [authData, setAuthData] = useState(initialAuthData);
@@ -41,13 +43,15 @@ const useOauth = (config = {}) => {
       const {data = {}} = apiError.response || {};
       const {message = 'Error de Autorización'} = data;
 
-      setError(message);
-      setLoading(false);
+      if (mounted) {
+        setError(message);
+        setLoading(false);
+      }
+
       return;
     }
 
     const authDataRes = await getAuthData(config);
-
     setAuthData(authDataRes);
   };
 
@@ -56,7 +60,7 @@ const useOauth = (config = {}) => {
    * @description method to logout an user
    * @public
    */
-  const handleLogout = async (logoutUrl = '') => {
+  const handleLogout = async () => {
     setLoading(true);
 
     try {
@@ -75,7 +79,6 @@ const useOauth = (config = {}) => {
       setLoading(true);
 
       const res = await getAuthData(config);
-
       if (!res.isLogged) {
         await handleAuthorize();
 
@@ -87,6 +90,10 @@ const useOauth = (config = {}) => {
     };
 
     validateLogin();
+
+    return () => {
+      mounted = false;
+    };
   }, [authData.isLogged]);
 
   useEffect(() => {
