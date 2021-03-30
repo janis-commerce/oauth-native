@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -13,3 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - eslint prettier
 - jest plugins and configuration files
 - husky and lint-staged
+- Async storage and react-native-app-auth installation
+- functions and components tests
+- context file
+- main AuthProvider component
+- useOauthData custom hook to get userData and handlers
+- App use example
