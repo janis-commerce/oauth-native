@@ -54,7 +54,7 @@ Export any component that needs access to oauth or openId user data using `useOa
 // ChildrenComponent.js (Some internal component on your app)
 import {useOauthData} from '@janiscommerce/oauth-native';
 
-const MyComponent = () => {
+const ChildrenComponent = () => {
   const {isLogged, handleLogout, ...rest} = useOauthData();
 
   console.log('...rest', rest);
@@ -82,10 +82,12 @@ const MyComponent = () => {
 
 **useOauthData returned states and methods**:
 
-| state           | Type     | description                                                          |
-| --------------- | -------- | -------------------------------------------------------------------- |
-| oauthTokens     | object   | all tokens obtained from authentication server                       |
-| handleLogout    | function | open a in App browser with logout url and clean async storage tokens |
-| handleAuthorize | object   | open a in App browser to authenticate user                           |
-| userData        | object   | user data from openId Connect                                        |
-| isLogged        | boolean  | -                                                                    |
+| state           | Type           | description                                                          |
+| --------------- | -------------- | -------------------------------------------------------------------- |
+| oauthTokens     | object         | all tokens obtained from authentication server                       |
+| handleLogout    | function       | open a in App browser with logout url and clean async storage tokens |
+| handleAuthorize | object         | open a in App browser to authenticate user                           |
+| userData        | object         | user data from openId Connect                                        |
+| isLogged        | boolean        | info about if user is logged                                         |
+| loading         | boolean        | -                                                                    |
+| error           | null or string | null if there is no errors or string with error message              |
