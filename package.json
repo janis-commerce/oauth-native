@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/oauth-native",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
   "react-native": "src/index.js",
