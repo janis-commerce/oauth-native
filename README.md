@@ -2,6 +2,10 @@
 
 Wrapper package to handle Janis OAuth module.
 
+[![Build Status](https://github.com/janis-commerce/oauth-native/actions/workflows/build-status.yml/badge.svg)](https://github.com/janis-commerce/oauth-native/actions/workflows/build-status.yml)
+[![Coverage Status](https://github.com/janis-commerce/oauth-native/actions/workflows/coverage-status.yml/badge.svg)](https://github.com/janis-commerce/oauth-native/actions/workflows/coverage-status.yml)
+[![npm version](https://badge.fury.io/js/%40janiscommerce%2Foauth-native.svg)](https://badge.fury.io/js/%40janiscommerce%2Foauth-native)
+
 > ⚠️ **Peer dependencies**: You must install react-native-app-auth: "^6.2.0" and react-native-inappbrowser-reborn: "^3.5.1" before using this package.
 
 ## Installation
