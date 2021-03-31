@@ -2,6 +2,8 @@
 
 Wrapper package to handle Janis OAuth module.
 
+> ⚠️ **Peer dependencies**: You must install react-native-app-auth: "^6.2.0" and react-native-inappbrowser-reborn: "^3.5.1" before using this package.
+
 ## Installation
 
 ```
@@ -11,6 +13,8 @@ npm install @janiscommerce/oauth-native
 ## Usage
 
 ### Main Auth Provider
+
+Wrap your app inside a `AuthProvider` component and pass required "config" and "logoutUrl" props. (to know more about config object, see [react-native-app-auth docs](https://www.npmjs.com/package/react-native-app-auth))
 
 ```js
 // App.js - (Your main app component)
@@ -42,7 +46,9 @@ const App = () => (
 export default App;
 ```
 
-### Custom hook to get user data
+### Custom hook
+
+Export any component that needs access to oauth or openId user data using `useOauthData`. By doing this, you'll have access to methods `handleLogout` or `handleAuthorize`, and some states.
 
 ```js
 // ChildrenComponent.js (Some internal component on your app)
