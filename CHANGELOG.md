@@ -14,9 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - eslint prettier
 - jest plugins and configuration files
 - husky and lint-staged
-- Async storage and react-native-app-auth installation
+- Async storage and react-native-app-auth as peer dependencies
 - functions and components tests
 - context file
 - main AuthProvider component
 - useOauthData custom hook to get userData and handlers
-- App use example
