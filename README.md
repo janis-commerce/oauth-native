@@ -79,3 +79,13 @@ const MyComponent = () => {
   );
 };
 ```
+
+**useOauthData returned states and methods**:
+
+| state           | Type     | description                                                          |
+| --------------- | -------- | -------------------------------------------------------------------- |
+| oauthTokens     | object   | all tokens obtained from authentication server                       |
+| handleLogout    | function | open a in App browser with logout url and clean async storage tokens |
+| handleAuthorize | object   | open a in App browser to authenticate user                           |
+| userData        | object   | user data from openId Connect                                        |
+| isLogged        | boolean  | -                                                                    |
