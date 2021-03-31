@@ -7,7 +7,7 @@
   "moduleFileExtensions": ["js", "jsx", "json"],
   "testMatch": ["**/__tests__/**/*.js?(x)", "**/?(*.)+(spec|test).js?(x)"],
   "setupFilesAfterEnv": ["./jest.setup.js"],
-  "coverageReporters": ["html", "text"],
+  "coverageReporters": ["html", "text", "lcov"],
   "coverageDirectory": "coverage",
   "collectCoverageFrom": [
     "App.js",
