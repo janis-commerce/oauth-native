@@ -12,7 +12,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "test": "jest --colors --c jest.config.json --bail --findRelatedTests",
+    "test": "jest --colors --c jest.config.json",
     "test:coverage": "jest --collectCoverage",
     "lint": "eslint .",
     "prepare": "bob build"
