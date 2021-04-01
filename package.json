@@ -1,11 +1,9 @@
 {
   "name": "@janiscommerce/oauth-native",
   "version": "1.0.0",
-  "main": "lib/commonjs/index.js",
-  "module": "lib/module/index.js",
+  "main": "src/index.js",
   "react-native": "src/index.js",
   "files": [
-    "lib/",
     "src/"
   ],
   "scripts": {
@@ -14,8 +12,7 @@
     "start": "react-native start",
     "test": "jest --colors --c jest.config.json",
     "test:coverage": "jest --collectCoverage",
-    "lint": "eslint .",
-    "prepare": "bob build"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.14.1",
@@ -45,7 +42,6 @@
     "lint-staged": "^10.5.4",
     "metro-react-native-babel-preset": "^0.59.0",
     "prettier": "^2.2.1",
-    "react-native-builder-bob": "^0.18.1",
     "react-test-renderer": "16.13.1",
     "react-native-app-auth": "^6.2.0",
     "react-native-inappbrowser-reborn": "^3.5.1"
@@ -56,19 +52,6 @@
   },
   "jest": {
     "preset": "react-native"
-  },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      [
-        "commonjs",
-        {
-          "copyFlow": true
-        }
-      ],
-      "module"
-    ]
   },
   "lint-staged": {
     "*.{js, jsx json}": [
