@@ -95,6 +95,6 @@ describe('useOauth hook', () => {
     );
     const {result, waitForNextUpdate} = renderHook(() => useOauth());
     await waitForNextUpdate();
-    expect(result.current.userData).toBeNull();
+    expect(result.current.userData).toEqual({});
   });
 });
