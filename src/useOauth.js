@@ -25,9 +25,10 @@ const useOauth = (config = {}, logoutUrl = '') => {
   let mounted = true;
 
   const initialAuthData = {isLogged: false, oauthTokens: null};
+  const initialUserData = {};
 
   const [authData, setAuthData] = useState(initialAuthData);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState(initialUserData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
