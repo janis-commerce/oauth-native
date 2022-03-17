@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [v1.1.0]
+
+### changed
+
+- default value for oauth dta is now empty object
+
 ## [v1.0.1]
 
 ### changed
