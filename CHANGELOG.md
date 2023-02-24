@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+## [v1.2.0]
+
+### changed
+
+- changed react and react-native version for dev dependencies and peer dependencies
+
 ## [v1.1.0]
 
 ### changed
@@ -19,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - main package file
 
-### removed 
+### removed
 
 - build-status workflow
 - react-native-builder-bob
