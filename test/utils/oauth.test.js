@@ -200,7 +200,7 @@ describe('OAuth Utils', () => {
 
       expect(loginData).toEqual({
         isLogged: false,
-        oauthTokens: null,
+        oauthTokens: {},
       });
     });
   });
@@ -210,7 +210,7 @@ describe('OAuth Utils', () => {
       const res = await getAuthData();
       expect(res).toEqual({
         isLogged: false,
-        oauthTokens: null,
+        oauthTokens: {},
       });
     });
 
