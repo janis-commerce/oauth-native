@@ -136,7 +136,7 @@ export const userAuthorize = async (config = {}) => {
  */
 export const getLoginObj = (tokens) => ({
   isLogged: !!tokens,
-  oauthTokens: tokens || null,
+  oauthTokens: tokens || {},
 });
 
 /**

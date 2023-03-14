@@ -2,7 +2,6 @@ import {useState, useEffect} from 'react';
 import jwtDecode from 'jwt-decode';
 import {userAuthorize, clearAuthorizeTokens, getAuthData} from './utils/oauth';
 import {logout} from './utils/browser';
-
 import {asyncWrap} from './utils/promises';
 
 /**
@@ -24,13 +23,16 @@ import {asyncWrap} from './utils/promises';
 const useOauth = (config = {}, logoutUrl = '') => {
   let mounted = true;
 
-  const initialAuthData = {isLogged: false, oauthTokens: null};
+  const initialAuthData = {isLogged: false, oauthTokens: {idToken: ''}};
   const initialUserData = {};
 
   const [authData, setAuthData] = useState(initialAuthData);
   const [userData, setUserData] = useState(initialUserData);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  const {oauthTokens = {}} = authData;
+  const {idToken = ''} = oauthTokens;
 
   /**
    * @name handleAuthorize
@@ -75,11 +77,42 @@ const useOauth = (config = {}, logoutUrl = '') => {
     }
   };
 
-  useEffect(() => {
-    const validateLogin = async () => {
-      setLoading(true);
+  /**
+   * @name handleDecodeToken
+   * @description method to decode token
+   * @public
+   */
 
+  const handleDecodeToken = () => {
+    try {
+      if (!authData.oauthTokens) return;
+
+      const {idToken = ''} = authData.oauthTokens;
+  
+      if (idToken) {
+        const decoded = jwtDecode(idToken);
+        if (decoded) {
+          setUserData(decoded);
+        }
+      }
+    } catch (e) {
+      console.warn(e)
+      setError('Error in decoding tokens');
+      setLoading(false);
+    }
+  }
+
+   /**
+   * @name handleValidateLogin
+   * @description method to validate login
+   * @public
+   */
+
+  const handleValidateLogin = async () => {
+    try {
+      setLoading(true);
       const res = await getAuthData(config);
+
       if (!res.isLogged) {
         await handleAuthorize();
 
@@ -88,9 +121,17 @@ const useOauth = (config = {}, logoutUrl = '') => {
 
       setAuthData(res);
       setLoading(false);
-    };
+   
+    } catch (e) {
+      console.warn(e)
+      setError('Error in validating login');
+      setLoading(false);
+    }
+  }
+    
 
-    validateLogin();
+  useEffect(() => {
+    handleValidateLogin();
 
     return () => {
       mounted = false;
@@ -98,16 +139,8 @@ const useOauth = (config = {}, logoutUrl = '') => {
   }, [authData.isLogged]);
 
   useEffect(() => {
-    if (!authData.oauthTokens) return;
-
-    const {idToken = ''} = authData.oauthTokens;
-
-    const decoded = jwtDecode(idToken);
-
-    if (decoded) {
-      setUserData(decoded);
-    }
-  }, [authData.oauthTokens]);
+    handleDecodeToken();
+  }, [idToken]);
 
   return {...authData, userData, handleLogout, handleAuthorize, loading, error};
 };
