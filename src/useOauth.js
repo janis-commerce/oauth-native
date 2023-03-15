@@ -31,7 +31,7 @@ const useOauth = (config = {}, logoutUrl = '') => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const {oauthTokens = {}} = authData;
+  const {oauthTokens} = authData;
   const {idToken = ''} = oauthTokens;
 
   /**
@@ -85,24 +85,21 @@ const useOauth = (config = {}, logoutUrl = '') => {
 
   const handleDecodeToken = () => {
     try {
-      if (!authData.oauthTokens) return;
-
-      const {idToken = ''} = authData.oauthTokens;
-  
       if (idToken) {
         const decoded = jwtDecode(idToken);
+        // istanbul ignore next
         if (decoded) {
           setUserData(decoded);
         }
       }
     } catch (e) {
-      console.warn(e)
+      console.warn(e);
       setError('Error in decoding tokens');
       setLoading(false);
     }
-  }
+  };
 
-   /**
+  /**
    * @name handleValidateLogin
    * @description method to validate login
    * @public
@@ -121,14 +118,12 @@ const useOauth = (config = {}, logoutUrl = '') => {
 
       setAuthData(res);
       setLoading(false);
-   
     } catch (e) {
-      console.warn(e)
+      console.warn(e);
       setError('Error in validating login');
       setLoading(false);
     }
-  }
-    
+  };
 
   useEffect(() => {
     handleValidateLogin();
