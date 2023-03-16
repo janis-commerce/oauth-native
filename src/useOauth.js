@@ -98,14 +98,21 @@ const useOauth = (config = {}, logoutUrl = '') => {
   }, [authData.isLogged]);
 
   useEffect(() => {
-    if (!authData.oauthTokens) return;
+    try {
+      if (!authData.oauthTokens) return;
 
-    const {idToken = ''} = authData.oauthTokens;
+      const {idToken = ''} = authData.oauthTokens;
 
-    const decoded = jwtDecode(idToken);
+      const decoded = jwtDecode(idToken);
 
-    if (decoded) {
-      setUserData(decoded);
+      // istanbul ignore next
+      if (decoded) {
+        setUserData(decoded);
+      }
+    } catch (reason) {
+      console.warn(reason);
+      setError('Error in decoding token');
+      setLoading(false);
     }
   }, [authData.oauthTokens]);
 
