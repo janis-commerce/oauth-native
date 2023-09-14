@@ -41,8 +41,8 @@ const useOauth = (config = {}, logoutUrl = '') => {
     const [, apiError] = await asyncWrap(userAuthorize(config));
 
     if (apiError) {
-      const {data = {}} = apiError.response || {};
-      const {message = 'Error de Autorización'} = data;
+      const {data} = apiError.response || {};
+      const {message = 'Error de Autorización'} = data || apiError;
 
       if (mounted) {
         setError(message);

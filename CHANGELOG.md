@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v1.2.2] - 2023-09-14
+
+### Fixed
+
+- Fixed the error message at handleAuthorize
+
 ## [v1.2.1] - 2023-03-16
 
 ### Fixed

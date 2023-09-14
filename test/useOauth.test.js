@@ -52,6 +52,16 @@ describe('useOauth hook', () => {
     expect(OAuthUtils.userAuthorize).toHaveBeenCalled();
   });
 
+  test('must call userAuthorize and set default message error', async () => {
+    spyOnJwtDecode.mockReturnValueOnce(() => ({name: 'example'}));
+    jest
+      .spyOn(OAuthUtils, 'userAuthorize')
+      .mockRejectedValueOnce({test: 'testError'});
+    const {waitForNextUpdate} = renderHook(() => useOauth());
+    await waitForNextUpdate();
+    expect(OAuthUtils.userAuthorize).toHaveBeenCalled();
+  });
+
   test('must call logout method', async () => {
     spyOnJwtDecode.mockReturnValueOnce(() => ({name: 'example'}));
     jest.spyOn(browserUtils, 'logout');
