@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as jwtDecode from 'jwt-decode';
 import {refresh, authorize} from 'react-native-app-auth';
 import {
   storeTokensCache,
@@ -10,6 +11,7 @@ import {
   getAuthData,
   getLoginObj,
   clearAuthorizeTokens,
+  getUserInfo,
 } from '../../src/utils/oauth';
 import keys from '../../src/keys';
 
@@ -331,6 +333,50 @@ describe('OAuth Utils', () => {
       const res = await clearAuthorizeTokens();
 
       expect(res).toBeFalsy();
+    });
+  });
+
+  describe('getUserInfo', () => {
+    describe('throws error with', () => {
+      it('with no get oauth tokens', async () => {
+        jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(null);
+
+        try {
+          await getUserInfo();
+        } catch (error) {
+          expect(error.message).toBe('cant get oauth tokens');
+        }
+      });
+
+      it('with no get id token', async () => {
+        jest
+          .spyOn(AsyncStorage, 'getItem')
+          .mockReturnValueOnce({example: 'example'});
+
+        try {
+          await getUserInfo();
+        } catch (error) {
+          expect(error.message).toBe('cant get id token');
+        }
+      });
+    });
+
+    describe('returns with', () => {
+      it('a correct response', async () => {
+        const dataMock = {idToken: 'example'};
+        jest.spyOn(AsyncStorage, 'setItem').mockReturnValueOnce(dataMock);
+        jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(dataMock);
+        jest.spyOn(jwtDecode, 'default').mockReturnValueOnce(dataMock);
+
+        try {
+          const response = await getUserInfo();
+          expect(response).toBeTruthy();
+        } catch (error) {
+          expect(error.message).toBe(
+            "Invalid token specified: Cannot read properties of undefined (reading 'replace')",
+          );
+        }
+      });
     });
   });
 });

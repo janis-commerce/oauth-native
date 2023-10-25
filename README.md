@@ -91,6 +91,7 @@ const ChildrenComponent = () => {
 | handleLogout    | function       | open a in App browser with logout url and clean async storage tokens |
 | handleAuthorize | function       | open a in App browser to authenticate user                           |
 | userData        | object         | user data from openId Connect                                        |
+| getUserInfo     | object         | user data information without depending on a context                 |
 | isLogged        | boolean        | info about if user is logged                                         |
 | loading         | boolean        | -                                                                    |
 | error           | null or string | null if there is no errors or string with error message              |
