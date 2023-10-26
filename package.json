@@ -11,7 +11,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest --colors --c jest.config.json",
-    "test:coverage": "jest --collectCoverage",
+    "test:coverage": "jest --collectCoverage --runInBand",
     "lint": "eslint ."
   },
   "dependencies": {
