@@ -198,7 +198,7 @@ export const getUserInfo = async () => {
     const {idToken = ''} = oauthTokens;
 
     if (!idToken) throw Error('cant get id token');
-    // istanbul ignore next
+
     return jwtDecode(idToken);
   } catch (error) {
     return Promise.reject(error);
