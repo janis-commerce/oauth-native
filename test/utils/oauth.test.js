@@ -364,7 +364,6 @@ describe('OAuth Utils', () => {
     describe('returns with', () => {
       it('a correct response', async () => {
         const dataMock = {idToken: 'example'};
-        jest.spyOn(AsyncStorage, 'setItem').mockReturnValueOnce(dataMock);
         jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(dataMock);
         jest.spyOn(jwtDecode, 'default').mockReturnValueOnce(dataMock);
 
