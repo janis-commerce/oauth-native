@@ -1,11 +1,6 @@
 import {useState, useEffect} from 'react';
 import jwtDecode from 'jwt-decode';
-import {
-  userAuthorize,
-  clearAuthorizeTokens,
-  getAuthData,
-  getUserInfo,
-} from './utils/oauth';
+import {userAuthorize, clearAuthorizeTokens, getAuthData} from './utils/oauth';
 import {logout} from './utils/browser';
 
 import {asyncWrap} from './utils/promises';
@@ -121,15 +116,7 @@ const useOauth = (config = {}, logoutUrl = '') => {
     }
   }, [authData.oauthTokens]);
 
-  return {
-    ...authData,
-    userData,
-    getUserInfo,
-    handleLogout,
-    handleAuthorize,
-    loading,
-    error,
-  };
+  return {...authData, userData, handleLogout, handleAuthorize, loading, error};
 };
 
 export default useOauth;
