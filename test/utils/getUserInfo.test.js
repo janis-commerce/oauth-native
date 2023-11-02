@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as jwtDecode from 'jwt-decode';
 import jwtDecodeUserMock from '../../mocks/jwt-decode';
 import {getUserInfo} from '../../src/utils/getUserInfo';
+import keys from '../../src/keys';
 
 jest.mock('jwt-decode', () => {
   const jwtDecodeMock = () => ({
@@ -21,7 +22,9 @@ jest.mock('jwt-decode', () => {
 describe('getUserInfo', () => {
   describe('throws error with', () => {
     it('with no get oauth tokens', async () => {
-      jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(null);
+      jest
+        .spyOn(AsyncStorage, 'getItem')
+        .mockReturnValueOnce(keys.OAUTH_TOKENS_KEY);
 
       try {
         await getUserInfo();
