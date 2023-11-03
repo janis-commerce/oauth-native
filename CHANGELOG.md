@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v1.3.0] - 2023-11-03
+
 ### Added
 
 - Added getUserInfo function in order to return current logged user data
