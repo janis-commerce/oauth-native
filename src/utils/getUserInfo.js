@@ -1,5 +1,5 @@
 import jwtDecode from 'jwt-decode';
-import {getTokensCache} from './oauth';
+import {getAuthData} from './oauth';
 
 /**
  * @name getUserInfo
@@ -10,7 +10,7 @@ import {getTokensCache} from './oauth';
  */
 export const getUserInfo = async () => {
   try {
-    const {oauthTokens} = await getTokensCache();
+    const {oauthTokens} = await getAuthData();
 
     if (!Object.keys(oauthTokens).length)
       throw new Error('cant get oauth tokens');

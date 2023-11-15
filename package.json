@@ -10,7 +10,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "test": "jest --colors --c jest.config.json",
+    "test": "jest --colors --c jest.config.json --passWithNoTests",
     "test:coverage": "jest --collectCoverage",
     "lint": "eslint ."
   },
