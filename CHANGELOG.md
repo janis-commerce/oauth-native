@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v1.3.1] - 2023-11-27
+
+### Fixed
+- Fixed the userTokens, at getUserInfo, are now obtained from getAuthData. This is to ensure that the data is always up to date.
+
 ### [v1.3.0] - 2023-11-03
 
 ### Added
