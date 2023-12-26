@@ -3,7 +3,7 @@ import {getAuthData} from './oauth';
 /**
  * @name getAccessToken
  * @description Function to return accessToken of oauth
- * @returns {string} accessToken
+ * @returns {Promise<string>} accessToken
  */
 export const getAccessToken = async () => {
   try {

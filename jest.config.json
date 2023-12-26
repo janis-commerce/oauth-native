@@ -5,7 +5,7 @@
   "moduleDirectories": ["node_modules", "src"],
   "clearMocks": true,
   "moduleFileExtensions": ["js", "jsx", "json"],
-  "testMatch": ["**/__tests__/**/*.js?(x)", "**/?(*.)+(spec|test).js?(x)"],
+  "testMatch": ["**/__tests__/**/*.js?(x)", "**/?(*.)+(spec|test).js?(x)", "**/__tests__/**/*.test.js"],
   "setupFilesAfterEnv": ["./jest.setup.js"],
   "coverageReporters": ["html", "text", "lcov"],
   "coverageDirectory": "coverage",
