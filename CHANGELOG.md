@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.4.0] - 2023-12-26
+
+### Added
+
+- Added getAccessToken function in order to return the accessToken string updated.
+
 ### [v1.3.1] - 2023-11-27
 
 ### Fixed
