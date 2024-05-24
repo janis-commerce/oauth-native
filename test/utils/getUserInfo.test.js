@@ -46,6 +46,16 @@ describe('getUserInfo', () => {
     });
   });
 
+  describe('return null when', () => {
+    it('obtains null oauthData or this is not an object', async () => {
+      jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(null);
+
+      const response = await getUserInfo();
+
+      expect(response).toBeNull();
+    });
+  });
+
   describe('returns with', () => {
     it('a correct response', async () => {
       const dataMock = {idToken: 'example'};

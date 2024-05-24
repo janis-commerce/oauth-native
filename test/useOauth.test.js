@@ -130,7 +130,7 @@ describe('useOauth hook', () => {
     const {result, waitForNextUpdate} = renderHook(() => useOauth());
 
     await waitForNextUpdate();
-    console.log('result.current', result.current);
+
     expect(result.current.isLogged).toStrictEqual(true);
   });
   it('should call decode with fake value in true', async () => {
