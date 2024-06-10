@@ -12,6 +12,8 @@ export const getUserInfo = async () => {
   try {
     const {oauthTokens} = await getAuthData();
 
+    if (!oauthTokens || oauthTokens.constructor !== Object) return null;
+
     if (!Object.keys(oauthTokens).length)
       throw new Error('cant get oauth tokens');
 
