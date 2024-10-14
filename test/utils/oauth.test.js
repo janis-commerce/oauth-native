@@ -305,6 +305,50 @@ describe('OAuth Utils', () => {
         console.error('e', e);
       }
     });
+
+    it('must return object with isLogged false and null tokens data', async () => {
+      const config = {
+        issuer: 'https://app.example.com',
+        clientId: 'c1e2e8d5-ccea-47aa-9075-f9741fe11452',
+        redirectUrl: 'example/callback',
+        scopes: ['openid', 'profile', 'email', 'offline_access'],
+        serviceConfiguration: {
+          authorizationEndpoint: 'https://app.example.com/oauth/authorize',
+          tokenEndpoint: 'https://app.example.com/2.0/token',
+        },
+      };
+
+      const now = Date.now();
+      const tomorrow = now + 86400000;
+      const date = new Date(tomorrow).toDateString();
+
+      await storeTokensCache({
+        accessTokenExpirationDate: date,
+        tokenType: 'Bearer',
+        expiresIn: 172799,
+        scope: 'openid profile email oms:order:read',
+        accessToken: 'access-token-1',
+        idToken: 'id-token-1',
+      });
+
+      const res = await getAuthData(config);
+
+      try {
+        expect(res).toEqual({
+          isLogged: true,
+          oauthTokens: {
+            accessTokenExpirationDate: date,
+            tokenType: 'Bearer',
+            expiresIn: 172799,
+            scope: 'openid profile email oms:order:read',
+            accessToken: 'access-token-1',
+            idToken: 'id-token-1',
+          },
+        });
+      } catch (e) {
+        console.error('e', e);
+      }
+    });
   });
 
   describe('clearAuthorizeTokens', () => {
