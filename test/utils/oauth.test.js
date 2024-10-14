@@ -306,7 +306,7 @@ describe('OAuth Utils', () => {
       }
     });
 
-    it('must return object with isLogged false and null tokens data', async () => {
+    it('must return object with isLogged true and tokens data when current tokens are valid', async () => {
       const config = {
         issuer: 'https://app.example.com',
         clientId: 'c1e2e8d5-ccea-47aa-9075-f9741fe11452',
