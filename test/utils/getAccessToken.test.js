@@ -9,7 +9,7 @@ describe('getAccessToken', () => {
         oauth.getAuthData = jest.fn().mockReturnValueOnce(invalidAuthData);
 
         await expect(getAccessToken()).rejects.toThrowError(
-          'cant get oauth tokens',
+          'Expired authentication tokens',
         );
       },
     );
@@ -22,7 +22,7 @@ describe('getAccessToken', () => {
         });
 
         await expect(getAccessToken()).rejects.toThrowError(
-          'cant get accessToken',
+          'Expired authentication access token',
         );
       },
     );

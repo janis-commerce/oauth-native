@@ -15,11 +15,11 @@ export const getUserInfo = async () => {
     if (!oauthTokens || oauthTokens.constructor !== Object) return null;
 
     if (!Object.keys(oauthTokens).length)
-      throw new Error('cant get oauth tokens');
+      throw new Error('Expired authentication tokens');
 
     const {idToken = ''} = oauthTokens;
 
-    if (!idToken) throw new Error('cant get id token');
+    if (!idToken) throw new Error('Expired authentication id token');
 
     return jwtDecode(idToken);
   } catch (error) {
