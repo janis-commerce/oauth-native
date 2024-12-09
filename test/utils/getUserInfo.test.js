@@ -29,7 +29,7 @@ describe('getUserInfo', () => {
       try {
         await getUserInfo();
       } catch (error) {
-        expect(error.message).toBe('cant get oauth tokens');
+        expect(error.message).toBe('Expired authentication tokens');
       }
     });
 
@@ -41,7 +41,7 @@ describe('getUserInfo', () => {
       try {
         await getUserInfo();
       } catch (error) {
-        expect(error.message).toBe('cant get id token');
+        expect(error.message).toBe('Expired authentication id token');
       }
     });
   });

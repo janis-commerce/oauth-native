@@ -11,12 +11,12 @@ export const getAccessToken = async () => {
     const {oauthTokens} = data || {};
 
     if (!oauthTokens || !Object.keys(oauthTokens).length)
-      throw new Error('cant get oauth tokens');
+      throw new Error('Expired authentication tokens');
 
     const {accessToken = ''} = oauthTokens;
 
     if (!accessToken || typeof accessToken !== 'string')
-      throw new Error('cant get accessToken');
+      throw new Error('Expired authentication access token');
 
     return accessToken;
   } catch (error) {
