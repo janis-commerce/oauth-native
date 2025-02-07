@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.4.2] - 2025-02-07
+
+### Changed
+
+- Error message when having expired tokens
+
 ### [v.1.4.1] - 2024-06-10
 
 ### Fixed
