@@ -3,6 +3,7 @@ import * as jwtDecode from 'jwt-decode';
 import jwtDecodeUserMock from '../../mocks/jwt-decode';
 import {getUserInfo} from '../../src/utils/getUserInfo';
 import keys from '../../src/keys';
+import * as oauth from '../../src/utils/oauth';
 
 jest.mock('jwt-decode', () => {
   const jwtDecodeMock = () => ({
@@ -44,30 +45,35 @@ describe('getUserInfo', () => {
         expect(error.message).toBe('Expired authentication id token');
       }
     });
-  });
-
-  describe('return null when', () => {
     it('obtains null oauthData or this is not an object', async () => {
       jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(null);
 
-      const response = await getUserInfo();
+      try {
+        await getUserInfo();
+      } catch (error) {
+        expect(error.message).toBe('Invalid authentication tokens types');
+      }
+    });
 
-      expect(response).toBeNull();
+    it('get auth data throws an error', async () => {
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        error: 'refresh error message',
+      });
+
+      await expect(getUserInfo()).rejects.toThrowError('refresh error message');
     });
   });
 
   describe('returns with', () => {
     it('a correct response', async () => {
       const dataMock = {idToken: 'example'};
-      await jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(dataMock);
-      await jest.spyOn(jwtDecode, 'default');
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        oauthTokens: dataMock,
+      });
+      jest.spyOn(jwtDecode, 'default');
 
-      try {
-        const response = await getUserInfo();
-        expect(response).toEqual(jwtDecodeUserMock);
-      } catch (error) {
-        console.warn(error);
-      }
+      const response = await getUserInfo();
+      expect(response).toEqual(jwtDecodeUserMock);
     });
   });
 });
