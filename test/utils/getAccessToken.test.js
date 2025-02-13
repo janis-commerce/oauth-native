@@ -3,18 +3,40 @@ import * as oauth from '../../src/utils/oauth';
 
 describe('getAccessToken', () => {
   describe('reject with error', () => {
-    it.each([null, undefined, 'test', {}, false, true, {oauthTokens: {}}])(
+    it('when get auth data fails', async () => {
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        oauthTokens: {},
+        error: 'refresh error message',
+      });
+
+      await expect(getAccessToken()).rejects.toThrowError(
+        'refresh error message',
+      );
+    });
+    it.each([null, 'test', false, true])(
       'error - invalid oauthTokens object',
       async (invalidAuthData) => {
-        oauth.getAuthData = jest.fn().mockReturnValueOnce(invalidAuthData);
+        oauth.getAuthData = jest
+          .fn()
+          .mockReturnValueOnce({oauthTokens: invalidAuthData});
 
         await expect(getAccessToken()).rejects.toThrowError(
-          'Expired authentication tokens',
+          'Invalid authentication tokens types',
         );
       },
     );
 
-    it.each([null, undefined, {}, false, true, {oauthTokens: {}}])(
+    it('error - expired authentication tokens', async () => {
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        oauthTokens: undefined,
+        error: null,
+      });
+
+      await expect(getAccessToken()).rejects.toThrowError(
+        'Expired authentication tokens',
+      );
+    });
+    it.each([null, false, true])(
       'error - invalid accessToken',
       async (invalidAccessToken) => {
         oauth.getAuthData = jest.fn().mockReturnValueOnce({
@@ -26,6 +48,16 @@ describe('getAccessToken', () => {
         );
       },
     );
+
+    it('error - expired authentication access token when oauthTokens not contains accessToken data', async () => {
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        oauthTokens: {mockedToken: 'mockedToken'},
+      });
+
+      await expect(getAccessToken()).rejects.toThrowError(
+        'Expired authentication access token',
+      );
+    });
   });
 
   it('returns the accessToken', async () => {

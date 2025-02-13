@@ -192,6 +192,7 @@ describe('OAuth Utils', () => {
       expect(loginData).toEqual({
         isLogged: true,
         oauthTokens: tokensMock,
+        error: null,
       });
     });
 
@@ -201,6 +202,7 @@ describe('OAuth Utils', () => {
       expect(loginData).toEqual({
         isLogged: false,
         oauthTokens: null,
+        error: null,
       });
     });
   });
@@ -211,6 +213,7 @@ describe('OAuth Utils', () => {
       expect(res).toEqual({
         isLogged: false,
         oauthTokens: null,
+        error: null,
       });
     });
 
@@ -239,6 +242,7 @@ describe('OAuth Utils', () => {
             accessToken: 'access-token-1',
             idToken: 'id-token-1',
           },
+          error: null,
         });
       } catch (error) {
         console.error(error);
@@ -264,6 +268,7 @@ describe('OAuth Utils', () => {
         expect(res).toEqual({
           isLogged: false,
           oauthTokens: null,
+          error: null,
         });
       } catch (e) {
         console.error('e', e);

@@ -134,9 +134,10 @@ export const userAuthorize = async (config = {}) => {
  * @param {object} tokens - oauth tokens
  * @returns {object} - object with user login data
  */
-export const getLoginObj = (tokens) => ({
+export const getLoginObj = (tokens, error = null) => ({
   isLogged: !!tokens,
   oauthTokens: tokens || null,
+  error,
 });
 
 /**
@@ -159,7 +160,7 @@ export const getAuthData = async (config = {}) => {
 
     return getLoginObj(oauthTokens);
   } catch (error) {
-    return getLoginObj();
+    return getLoginObj(null, error.message);
   }
 };
 

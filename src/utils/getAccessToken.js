@@ -7,10 +7,14 @@ import {getAuthData} from './oauth';
  */
 export const getAccessToken = async () => {
   try {
-    const data = await getAuthData();
-    const {oauthTokens} = data || {};
+    const {oauthTokens = {}, error} = await getAuthData();
 
-    if (!oauthTokens || !Object.keys(oauthTokens).length)
+    if (error) throw new Error(error);
+
+    if (oauthTokens?.constructor !== Object)
+      throw new Error('Invalid authentication tokens types');
+
+    if (!Object.keys(oauthTokens).length)
       throw new Error('Expired authentication tokens');
 
     const {accessToken = ''} = oauthTokens;
