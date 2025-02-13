@@ -157,6 +157,10 @@ export const getAuthData = async (config = {}) => {
       return getLoginObj(newTokens);
     }
 
+    if (isExpired(expiration)) {
+      return getLoginObj();
+    }
+
     return getLoginObj(oauthTokens);
   } catch (error) {
     return getLoginObj();

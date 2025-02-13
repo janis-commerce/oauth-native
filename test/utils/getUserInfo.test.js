@@ -1,8 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as jwtDecode from 'jwt-decode';
 import jwtDecodeUserMock from '../../mocks/jwt-decode';
 import {getUserInfo} from '../../src/utils/getUserInfo';
-import keys from '../../src/keys';
+import {getAuthData} from '../../src/utils/oauth';
 
 jest.mock('jwt-decode', () => {
   const jwtDecodeMock = () => ({
@@ -19,12 +18,17 @@ jest.mock('jwt-decode', () => {
   return jwtDecodeMock;
 });
 
+jest.mock('../../src/utils/oauth', () => ({
+  getAuthData: jest.fn(),
+}));
+
 describe('getUserInfo', () => {
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
   describe('throws error with', () => {
     it('with no get oauth tokens', async () => {
-      jest
-        .spyOn(AsyncStorage, 'getItem')
-        .mockReturnValueOnce(keys.OAUTH_TOKENS_KEY);
+      getAuthData.mockResolvedValueOnce({oauthTokens: {}});
 
       try {
         await getUserInfo();
@@ -34,9 +38,9 @@ describe('getUserInfo', () => {
     });
 
     it('with no get id token', async () => {
-      jest
-        .spyOn(AsyncStorage, 'getItem')
-        .mockReturnValueOnce({example: 'example'});
+      getAuthData.mockResolvedValueOnce({
+        oauthTokens: {refreshToken: 'refresh_token'},
+      });
 
       try {
         await getUserInfo();
@@ -48,8 +52,7 @@ describe('getUserInfo', () => {
 
   describe('return null when', () => {
     it('obtains null oauthData or this is not an object', async () => {
-      jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(null);
-
+      getAuthData.mockResolvedValueOnce({oauthTokens: null});
       const response = await getUserInfo();
 
       expect(response).toBeNull();
@@ -59,7 +62,7 @@ describe('getUserInfo', () => {
   describe('returns with', () => {
     it('a correct response', async () => {
       const dataMock = {idToken: 'example'};
-      await jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(dataMock);
+      getAuthData.mockResolvedValueOnce({oauthTokens: dataMock});
       await jest.spyOn(jwtDecode, 'default');
 
       try {
