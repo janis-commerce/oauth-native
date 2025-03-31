@@ -100,7 +100,7 @@ describe('WithTokensExpirationAccess', () => {
     expect(mockCallback).not.toHaveBeenCalled();
   });
 
-  it('calls `verifyExpiration` inside `useEffect` on mount and executes default callback', async () => {
+  it('calls `checkExpiration` inside `useEffect` on mount and executes default callback', async () => {
     getTokensCache.mockResolvedValue({
       expiration: Date.now() + 10 * 60 * 1000,
     });
@@ -116,5 +116,30 @@ describe('WithTokensExpirationAccess', () => {
     jest.advanceTimersByTime(5000);
 
     expect(getTokensCache).toHaveBeenCalledTimes(1);
+  });
+
+  it('handles error when verifying token expiration', async () => {
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    getTokensCache.mockRejectedValue(new Error('Token cache error'));
+
+    await act(async () => {
+      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+        minimumTokenExpirationTime: 120,
+        callback: mockCallback,
+      });
+
+      renderer.create(<WrappedComponent />);
+    });
+
+    expect(mockCallback).not.toHaveBeenCalled();
+    expect(mockLogout).not.toHaveBeenCalled();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Error verifying token expiration:',
+      expect.any(Error),
+    );
+
+    consoleErrorSpy.mockRestore();
   });
 });

@@ -48,10 +48,8 @@ export const WithTokensExpirationAccess = (Component, config = {}) => (
         callback();
         logout();
       }
-
-      return null;
-    } catch (reason) {
-      return Promise.reject(reason?.response?.data || reason);
+    } catch (error) {
+      console.error('Error verifying token expiration:', error);
     }
   };
 
