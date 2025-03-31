@@ -27,33 +27,36 @@ export const WithTokensExpirationAccess = (Component, config = {}) => (
 
   const {minimumTokenExpirationTime = 120, callback = () => {}} = config;
 
-  const hasReachedExpirationThreshold = (
-    expirationTime,
-    timeBeforeExpiration,
-  ) => {
+  const isTokenNearExpiration = (expirationTime, timeBeforeExpiration) => {
     const currentTime = Date.now();
-    const timeDifference = expirationTime - currentTime;
+    const remainingTimeUntilExpiration = expirationTime - currentTime;
     const expirationThreshold = timeBeforeExpiration * 60 * 1000;
 
-    return timeDifference <= expirationThreshold;
+    return remainingTimeUntilExpiration <= expirationThreshold;
   };
 
-  const verifyExpiration = async () => {
-    const {expiration} = await getTokensCache();
+  const checkTokenExpiration = async () => {
+    try {
+      const {expiration} = await getTokensCache();
 
-    const needToExecuteCallback = hasReachedExpirationThreshold(
-      expiration,
-      minimumTokenExpirationTime,
-    );
+      const needToExecuteCallback = isTokenNearExpiration(
+        expiration,
+        minimumTokenExpirationTime,
+      );
 
-    if (needToExecuteCallback) {
-      callback();
-      logout();
+      if (needToExecuteCallback) {
+        callback();
+        logout();
+      }
+
+      return null;
+    } catch (reason) {
+      return Promise.reject(reason?.response?.data || reason);
     }
   };
 
   useEffect(() => {
-    verifyExpiration();
+    checkTokenExpiration();
   }, []);
 
   return <Component {...props} />;
