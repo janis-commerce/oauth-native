@@ -2,6 +2,17 @@ import React, {useEffect} from 'react';
 import {getTokensCache} from './utils/oauth';
 import {useOauthData} from './useOauthData';
 
+const isTokenExpired = (expirationTime) => {
+  const currentTime = Date.now();
+  return expirationTime <= currentTime;
+};
+
+const isTokenNearExpiration = (expirationTime, thresholdInMinutes) => {
+  const currentTime = Date.now();
+  const thresholdInMs = thresholdInMinutes * 60 * 1000;
+  return expirationTime - currentTime <= thresholdInMs;
+};
+
 /**
  * Higher Order Component that checks if the access token is about to expire
  * and if so, it logs out the user and calls the callback function.
@@ -15,8 +26,10 @@ import {useOauthData} from './useOauthData';
  * @param {object} config - Object with the configuration options.
  * @param {number} config.minimumTokenExpirationTime - The minimum time in minutes
  * before the token expires to execute the callback.
- * @param {function} config.callback - The callback function to execute when the token
+ * @param {function} config.onTokenNearExpiration - The callback function to execute when the token
  * has reached the expiration threshold.
+ * @param {function} config.onTokenExpired - The callback function to execute when the token
+ * has expired.
  *
  * @return {React.Component} The wrapped component.
  */
@@ -25,28 +38,23 @@ export const WithTokensExpirationAccess = (Component, config = {}) => (
 ) => {
   const {handleLogout: logout} = useOauthData();
 
-  const {minimumTokenExpirationTime = 120, callback = () => {}} = config;
-
-  const isTokenNearExpiration = (expirationTime, timeBeforeExpiration) => {
-    const currentTime = Date.now();
-    const remainingTimeUntilExpiration = expirationTime - currentTime;
-    const expirationThreshold = timeBeforeExpiration * 60 * 1000;
-
-    return remainingTimeUntilExpiration <= expirationThreshold;
-  };
+  const {
+    minimumTokenExpirationTime = 120,
+    onTokenNearExpiration = () => {},
+    onTokenExpired = () => {},
+  } = config;
 
   const checkTokenExpiration = async () => {
     try {
       const {expiration} = await getTokensCache();
 
-      const needToExecuteCallback = isTokenNearExpiration(
-        expiration,
-        minimumTokenExpirationTime,
-      );
-
-      if (needToExecuteCallback) {
-        callback();
+      if (isTokenExpired(expiration)) {
+        onTokenExpired();
         logout();
+      } else if (
+        isTokenNearExpiration(expiration, minimumTokenExpirationTime)
+      ) {
+        onTokenNearExpiration();
       }
     } catch (error) {
       console.error('Error verifying token expiration:', error);
