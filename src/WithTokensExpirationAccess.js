@@ -47,17 +47,24 @@ export const WithTokensExpirationAccess = (Component, config = {}) => (
   const checkTokenExpiration = async () => {
     try {
       const {expiration} = await getTokensCache();
+      const isExpired = isTokenExpired(expiration);
+      const isNearExpiration = isTokenNearExpiration(
+        expiration,
+        minimumTokenExpirationTime,
+      );
 
-      if (isTokenExpired(expiration)) {
+      if (isExpired) {
         onTokenExpired();
-        logout();
-      } else if (
-        isTokenNearExpiration(expiration, minimumTokenExpirationTime)
-      ) {
-        onTokenNearExpiration();
+        return logout();
       }
+
+      if (isNearExpiration) {
+        return onTokenNearExpiration();
+      }
+
+      return null;
     } catch (error) {
-      console.error('Error verifying token expiration:', error);
+      return console.error('Error verifying token expiration:', error);
     }
   };
 
