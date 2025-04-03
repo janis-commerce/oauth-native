@@ -33,7 +33,7 @@ const isTokenNearExpiration = (expirationTime, thresholdInMinutes) => {
  *
  * @return {React.Component} The wrapped component.
  */
-export const WithTokensExpirationAccess = (Component, config = {}) => (
+export const withTokensExpirationAccess = (Component, config = {}) => (
   props,
 ) => {
   const {handleLogout: logout} = useOauthData();
@@ -48,15 +48,16 @@ export const WithTokensExpirationAccess = (Component, config = {}) => (
     try {
       const {expiration} = await getTokensCache();
       const isExpired = isTokenExpired(expiration);
-      const isNearExpiration = isTokenNearExpiration(
-        expiration,
-        minimumTokenExpirationTime,
-      );
 
       if (isExpired) {
         onTokenExpired();
         return logout();
       }
+
+      const isNearExpiration = isTokenNearExpiration(
+        expiration,
+        minimumTokenExpirationTime,
+      );
 
       if (isNearExpiration) {
         return onTokenNearExpiration();

@@ -1,7 +1,7 @@
 import 'react-native';
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
-import {WithTokensExpirationAccess} from '../src';
+import {withTokensExpirationAccess} from '../src';
 import {getTokensCache} from '../src/utils/oauth';
 import {useOauthData} from '../src/useOauthData';
 
@@ -19,7 +19,7 @@ const mockOnTokenExpired = jest.fn();
 
 const MockComponent = () => <></>;
 
-describe('WithTokensExpirationAccess', () => {
+describe('withTokensExpirationAccess', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -40,7 +40,7 @@ describe('WithTokensExpirationAccess', () => {
 
     let tree;
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent);
+      const WrappedComponent = withTokensExpirationAccess(MockComponent);
 
       tree = renderer.create(<WrappedComponent />);
     });
@@ -54,7 +54,7 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         onTokenNearExpiration: mockOnTokenNearExpiration,
       });
 
@@ -71,7 +71,7 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {});
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {});
 
       renderer.create(<WrappedComponent />);
     });
@@ -86,7 +86,7 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         onTokenExpired: mockOnTokenExpired,
       });
 
@@ -103,7 +103,7 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         minimumTokenExpirationTime: 120,
         onTokenNearExpiration: mockOnTokenNearExpiration,
       });
@@ -121,7 +121,7 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         minimumTokenExpirationTime: 120,
       });
 
@@ -140,7 +140,7 @@ describe('WithTokensExpirationAccess', () => {
     getTokensCache.mockRejectedValue(new Error('Token cache error'));
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         minimumTokenExpirationTime: 120,
       });
 

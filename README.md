@@ -103,14 +103,14 @@ The method **getUserInfo** compared to **useOauthData.userData** is not context 
 | ----------- | ------ | ---------------------------------------------------- |
 | getUserInfo | object | user data information without depending on a context |
 
-### WithTokensExpirationAccess HOC
+### withTokensExpirationAccess HOC
 
 HOC that provides automatic token expiration handling to wrapped components. It monitors the access token and refreshes it if it’s about to expire, ensuring the user session stays active without manual intervention as well as providing the option to alert the user some time before
 the token expires.
 
 ```js
 // SomeScreen.js
-import {WithTokensExpirationAccess} from '@janiscommerce/oauth-native';
+import {withTokensExpirationAccess} from '@janiscommerce/oauth-native';
 
 const SomeScreen = () => {
   return (
@@ -120,7 +120,7 @@ const SomeScreen = () => {
   );
 };
 
-export default WithTokensExpirationAccess(SomeScreen, {
+export default withTokensExpirationAccess(SomeScreen, {
   onTokenNearExpiration: () =>
     Toast.show({text2: 'Token near expiration!', type: 'warning'}),
   onTokenExpired: () => console.log('Log out!'),
