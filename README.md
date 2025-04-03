@@ -99,6 +99,38 @@ const ChildrenComponent = () => {
 
 The method **getUserInfo** compared to **useOauthData.userData** is not context dependent.
 
-| state           | Type           | description                                                          |
-| --------------- | -------------- | -------------------------------------------------------------------- |
-| getUserInfo     | object         | user data information without depending on a context                 |
+| state       | Type   | description                                          |
+| ----------- | ------ | ---------------------------------------------------- |
+| getUserInfo | object | user data information without depending on a context |
+
+### withTokensExpirationAccess HOC
+
+HOC that provides automatic token expiration handling to wrapped components. It monitors the access token and refreshes it if it’s about to expire, ensuring the user session stays active without manual intervention as well as providing the option to alert the user some time before
+the token expires.
+
+```js
+// SomeScreen.js
+import {withTokensExpirationAccess} from '@janiscommerce/oauth-native';
+
+const SomeScreen = () => {
+  return (
+    <View>
+      <Text>Screen</Text>
+    </View>
+  );
+};
+
+export default withTokensExpirationAccess(SomeScreen, {
+  onTokenNearExpiration: () =>
+    Toast.show({text2: 'Token near expiration!', type: 'warning'}),
+  onTokenExpired: () => console.log('Log out!'),
+});
+```
+
+**WithTokensExpirationAccess Configuration Options:**
+
+| config option              | Type     | Description                                                                                          |
+| -------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| minimumTokenExpirationTime | number   | Time in minutes before token expiration to trigger near-expiration callback. Default is 120 minutes. |
+| onTokenNearExpiration      | function | Callback function triggered when the token is near expiration.                                       |
+| onTokenExpired             | function | Callback function triggered when the token is expired. Also logs the user out.                       |

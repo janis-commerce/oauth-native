@@ -1,7 +1,7 @@
 import 'react-native';
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
-import {WithTokensExpirationAccess} from '../src';
+import {withTokensExpirationAccess} from '../src';
 import {getTokensCache} from '../src/utils/oauth';
 import {useOauthData} from '../src/useOauthData';
 
@@ -14,11 +14,12 @@ jest.mock('../src/useOauthData', () => ({
 }));
 
 const mockLogout = jest.fn();
-const mockCallback = jest.fn();
+const mockOnTokenNearExpiration = jest.fn();
+const mockOnTokenExpired = jest.fn();
 
 const MockComponent = () => <></>;
 
-describe('WithTokensExpirationAccess', () => {
+describe('withTokensExpirationAccess', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -39,7 +40,7 @@ describe('WithTokensExpirationAccess', () => {
 
     let tree;
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent);
+      const WrappedComponent = withTokensExpirationAccess(MockComponent);
 
       tree = renderer.create(<WrappedComponent />);
     });
@@ -47,38 +48,52 @@ describe('WithTokensExpirationAccess', () => {
     expect(tree.toJSON()).toBeNull();
   });
 
-  it('does NOT execute callback or logout if token expiration is far away', async () => {
-    getTokensCache.mockResolvedValue({
-      expiration: Date.now() + 3 * 60 * 60 * 1000,
-    });
-
-    await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
-        minimumTokenExpirationTime: 120,
-        callback: mockCallback,
-      });
-
-      renderer.create(<WrappedComponent />);
-    });
-
-    expect(mockCallback).not.toHaveBeenCalled();
-    expect(mockLogout).not.toHaveBeenCalled();
-  });
-
-  it('executes callback and logouts when token is about to expire without minimumTokenExpirationTime', async () => {
+  it('executes onTokenNearExpiration when token is about to expire without minimumTokenExpirationTime', async () => {
     getTokensCache.mockResolvedValue({
       expiration: Date.now() + 1000,
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
-        callback: mockCallback,
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
+        onTokenNearExpiration: mockOnTokenNearExpiration,
       });
 
       renderer.create(<WrappedComponent />);
     });
 
-    expect(mockCallback).toHaveBeenCalled();
+    expect(mockOnTokenNearExpiration).toHaveBeenCalled();
+    expect(mockLogout).not.toHaveBeenCalled();
+  });
+
+  it('does not execute onTokenExpired as there is no callback and logouts when token has expired', async () => {
+    getTokensCache.mockResolvedValue({
+      expiration: Date.now(),
+    });
+
+    await act(async () => {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {});
+
+      renderer.create(<WrappedComponent />);
+    });
+
+    expect(mockOnTokenExpired).not.toHaveBeenCalled();
+    expect(mockLogout).toHaveBeenCalled();
+  });
+
+  it('executes onTokenExpired and logouts when token has expired', async () => {
+    getTokensCache.mockResolvedValue({
+      expiration: Date.now(),
+    });
+
+    await act(async () => {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
+        onTokenExpired: mockOnTokenExpired,
+      });
+
+      renderer.create(<WrappedComponent />);
+    });
+
+    expect(mockOnTokenExpired).toHaveBeenCalled();
     expect(mockLogout).toHaveBeenCalled();
   });
 
@@ -88,16 +103,16 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         minimumTokenExpirationTime: 120,
-        callback: mockCallback,
+        onTokenNearExpiration: mockOnTokenNearExpiration,
       });
 
       renderer.create(<WrappedComponent />);
     });
 
     expect(mockLogout).not.toHaveBeenCalled();
-    expect(mockCallback).not.toHaveBeenCalled();
+    expect(mockOnTokenNearExpiration).not.toHaveBeenCalled();
   });
 
   it('calls `checkExpiration` inside `useEffect` on mount and executes default callback', async () => {
@@ -106,7 +121,7 @@ describe('WithTokensExpirationAccess', () => {
     });
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         minimumTokenExpirationTime: 120,
       });
 
@@ -125,15 +140,13 @@ describe('WithTokensExpirationAccess', () => {
     getTokensCache.mockRejectedValue(new Error('Token cache error'));
 
     await act(async () => {
-      const WrappedComponent = WithTokensExpirationAccess(MockComponent, {
+      const WrappedComponent = withTokensExpirationAccess(MockComponent, {
         minimumTokenExpirationTime: 120,
-        callback: mockCallback,
       });
 
       renderer.create(<WrappedComponent />);
     });
 
-    expect(mockCallback).not.toHaveBeenCalled();
     expect(mockLogout).not.toHaveBeenCalled();
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Error verifying token expiration:',
