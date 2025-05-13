@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.6.0] - 2025-04-03
+
+### Added
+
+- withTokenExpirationAccess to logout user if token is expired.
+
+### [v.1.5.0] - 2025-02-13
+
+### Changed
+
+- Error handler in getAccessToken and getUserInfo
+
 ### [v.1.4.2] - 2025-02-07
 
 ### Changed
