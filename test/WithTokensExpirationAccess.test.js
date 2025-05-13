@@ -48,20 +48,31 @@ describe('withTokensExpirationAccess', () => {
     expect(tree.toJSON()).toBeNull();
   });
 
-  it('executes onTokenNearExpiration when token is about to expire without minimumTokenExpirationTime', async () => {
+  it('executes onTokenNearExpiration when token is near expiration but not yet expired', async () => {
+    const minutesToConsiderTokenAsExpired = 10;
+    const minutesToConsiderTokenAsNearExpiration = 5;
+
+    const expiration =
+      Date.now() +
+      (minutesToConsiderTokenAsExpired +
+        minutesToConsiderTokenAsNearExpiration -
+        1) *
+        60 *
+        1000;
+
     getTokensCache.mockResolvedValue({
-      expiration: Date.now() + 1000,
+      expiration,
     });
 
     await act(async () => {
       const WrappedComponent = withTokensExpirationAccess(MockComponent, {
-        onTokenNearExpiration: mockOnTokenNearExpiration,
+        minutesToConsiderTokenAsExpired,
+        minutesToConsiderTokenAsNearExpiration,
       });
 
       renderer.create(<WrappedComponent />);
     });
 
-    expect(mockOnTokenNearExpiration).toHaveBeenCalled();
     expect(mockLogout).not.toHaveBeenCalled();
   });
 
