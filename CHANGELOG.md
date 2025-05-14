@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.7.0] - 2025-05-14
+
+### Changed
+
+- withTokenExpirationAccess in order to work with a config time to consider as near expiration
+
 ### [v.1.6.0] - 2025-04-03
 
 ### Added
