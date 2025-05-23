@@ -144,13 +144,21 @@ The method **isTokenExpired** checks if the current token has expired by retriev
 // SomeComponent.js
 import {isTokenExpired} from '@janiscommerce/oauth-native';
 
-const SomeComponent = async () => {
-  const expired = await isTokenExpired();
-  if (expired) {
-    console.log('Token has expired');
-  } else {
-    console.log('Token is still valid');
-  }
++const SomeComponent = () => {
++  useEffect(() => {
++    const checkTokenExpiration = async () => {
++      const expired = await isTokenExpired();
++      if (expired) {
++        console.log('Token has expired');
++      } else {
++        console.log('Token is still valid');
++      }
++    };
++    checkTokenExpiration();
++  }, []);
++
++  return <View>...</View>;
+ };
 };
 ```
 
