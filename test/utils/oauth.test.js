@@ -10,6 +10,7 @@ import {
   getAuthData,
   getLoginObj,
   clearAuthorizeTokens,
+  isTokenExpired,
 } from '../../src/utils/oauth';
 import keys from '../../src/keys';
 
@@ -336,6 +337,40 @@ describe('OAuth Utils', () => {
       const res = await clearAuthorizeTokens();
 
       expect(res).toBeFalsy();
+    });
+  });
+
+  describe('isTokenExpired', () => {
+    it('should return true if the token is expired', async () => {
+      // Mock getTokensCache to return an expired timestamp
+      AsyncStorage.setItem(
+        keys.OAUTH_TOKENS_EXPIRATION_KEY,
+        JSON.stringify(Date.now() - 1000), // 1 second ago
+      );
+      expect(await isTokenExpired()).toBe(true);
+    });
+
+    it('should return false if the token is not expired', async () => {
+      // Mock getTokensCache to return a future timestamp
+      AsyncStorage.setItem(
+        keys.OAUTH_TOKENS_EXPIRATION_KEY,
+        JSON.stringify(Date.now() + 60000), // 1 minute in the future
+      );
+      expect(await isTokenExpired()).toBe(false);
+    });
+
+    it('should return true if expiration is not set in cache', async () => {
+      // AsyncStorage.getItem will return null for OAUTH_TOKENS_EXPIRATION_KEY
+      expect(await isTokenExpired()).toBe(true);
+    });
+
+    it('should return false if getTokensCache throws an error', async () => {
+      jest
+        .spyOn(AsyncStorage, 'getItem')
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error('AsyncStorage error')),
+        );
+      expect(await isTokenExpired()).toBe(false);
     });
   });
 });

@@ -180,3 +180,18 @@ export const clearAuthorizeTokens = async () => {
     return false;
   }
 };
+
+/**
+ * @name isTokenExpired
+ * @description Asynchronously checks if the token is expired by retrieving the expiration time from the cache.
+ * @async
+ * @returns {Promise<boolean>} - Resolves to true if the token is expired, false otherwise.
+ */
+export const isTokenExpired = async () => {
+  try {
+    const {expiration} = await getTokensCache();
+    return isExpired(expiration);
+  } catch (reason) {
+    return false;
+  }
+};

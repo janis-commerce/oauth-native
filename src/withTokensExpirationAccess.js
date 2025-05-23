@@ -2,33 +2,7 @@ import React, {useEffect} from 'react';
 import {getTokensCache} from './utils/oauth';
 import {useOauthData} from './useOauthData';
 
-const isTokenExpired = (expirationTime, minutesToConsiderTokenAsExpired) => {
-  const currentTime = Date.now();
-  const thresholdInMinutes = minutesToConsiderTokenAsExpired * 60 * 1000;
-  return expirationTime - currentTime <= thresholdInMinutes;
-};
-
-const isTokenNearExpiration = (
-  expirationTime,
-  minutesToConsiderTokenAsExpired,
-  minutesToConsiderTokenAsNearExpiration,
-) => {
-  const currentTime = Date.now();
-  const expirationThresholdInMilliseconds =
-    minutesToConsiderTokenAsExpired * 60 * 1000;
-  const nearExpirationOffsetInMilliseconds =
-    minutesToConsiderTokenAsNearExpiration * 60 * 1000;
-
-  const nearExpirationTime =
-    expirationTime -
-    expirationThresholdInMilliseconds -
-    nearExpirationOffsetInMilliseconds;
-
-  return (
-    currentTime >= nearExpirationTime &&
-    currentTime < expirationTime - expirationThresholdInMilliseconds
-  );
-};
+const minutesToMs = (minutes) => minutes * 60 * 1000;
 
 /**
  * Higher Order Component that checks if the access token is near expiration or already expired,
@@ -37,19 +11,24 @@ const isTokenNearExpiration = (
  * The check is performed once when the component mounts.
  *
  * - A token is considered expired when the current time is within
- *   `minutesToConsiderTokenAsExpired` minutes of the actual `expiration` timestamp.
+ *   `minutesToConsiderTokenAsExpired` minutes of (or past) the actual `expiration` timestamp.
+ *   If `minutesToConsiderTokenAsExpired` is 0, the token is considered expired only if the current time
+ *   is at or after the `expiration` timestamp.
  *   In this case, `onTokenExpired` is executed and logout is triggered.
  *
- * - A token is considered near expiration when the current time is within the window
- *   defined by `minutesToConsiderTokenAsNearExpiration` minutes before that expiration threshold,
- *   but after the window of regular validity. In that case, `onTokenNearExpiration` is executed.
+ * - A token is considered near expiration if `minutesToConsiderTokenAsNearExpiration` is a valid number
+ *   greater than `minutesToConsiderTokenAsExpired`. The "near expiration" window starts
+ *   `minutesToConsiderTokenAsNearExpiration` minutes before the actual `expiration` timestamp and ends
+ *   just before the token is considered expired (as defined by `minutesToConsiderTokenAsExpired`).
+ *   In that case, `onTokenNearExpiration` is executed.
  *
  * @param {React.Component} Component - The component to wrap.
  * @param {object} config - Configuration options.
- * @param {number} [config.minutesToConsiderTokenAsExpired=120] - Number of minutes before the real expiration time
- *   at which the token should be considered expired.
- * @param {number} [config.minutesToConsiderTokenAsNearExpiration=120] - Number of minutes before the expiration threshold
- *   to consider the token as near expiration.
+ * @param {number} [config.minutesToConsiderTokenAsExpired=0] - Number of minutes before the real expiration time
+ *   at which the token should be considered expired. Defaults to 0, meaning expired at or after the exact expiration time.
+ * @param {number | null} [config.minutesToConsiderTokenAsNearExpiration=null] - Number of minutes before the real expiration time
+ *   to consider the token as near expiration. For `onTokenNearExpiration` to be triggered, this value must be a number
+ *   and strictly greater than `minutesToConsiderTokenAsExpired`. Defaults to null, disabling near expiration check.
  * @param {function} [config.onTokenNearExpiration] - Callback executed when the token is in the pre-expiration window.
  * @param {function} [config.onTokenExpired] - Callback executed when the token is expired.
  *
@@ -61,8 +40,8 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
   const {handleLogout: logout} = useOauthData();
 
   const {
-    minutesToConsiderTokenAsNearExpiration = 120,
-    minutesToConsiderTokenAsExpired = 120,
+    minutesToConsiderTokenAsNearExpiration = null,
+    minutesToConsiderTokenAsExpired = 0,
     onTokenNearExpiration = () => {},
     onTokenExpired = () => {},
   } = config;
@@ -70,24 +49,37 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
   const checkTokenExpiration = async () => {
     try {
       const {expiration} = await getTokensCache();
-      const isExpired = isTokenExpired(
-        expiration,
-        minutesToConsiderTokenAsExpired,
-      );
 
-      if (isExpired) {
+      const currentTime = Date.now();
+      const expirationTimeInMs = expiration;
+
+      const expirationThresholdTime =
+        expirationTimeInMs - minutesToMs(minutesToConsiderTokenAsExpired);
+
+      // Check if token is expired
+      if (currentTime >= expirationThresholdTime) {
         onTokenExpired();
         return logout();
       }
 
-      const isNearExpiration = isTokenNearExpiration(
-        expiration,
-        minutesToConsiderTokenAsExpired,
-        minutesToConsiderTokenAsNearExpiration,
-      );
+      const isMinutesNearExpirationValid =
+        typeof minutesToConsiderTokenAsNearExpiration === 'number' &&
+        minutesToConsiderTokenAsNearExpiration >
+          minutesToConsiderTokenAsExpired;
 
-      if (isNearExpiration) {
-        return onTokenNearExpiration();
+      // Check if token is near expiration
+      // Condition: minutesToConsiderTokenAsNearExpiration must be a number and greater than minutesToConsiderTokenAsExpired
+      if (isMinutesNearExpirationValid) {
+        const nearExpirationStartTime =
+          expirationTimeInMs -
+          minutesToMs(minutesToConsiderTokenAsNearExpiration);
+
+        if (
+          currentTime >= nearExpirationStartTime &&
+          currentTime < expirationThresholdTime // Must be before it's considered expired
+        ) {
+          return onTokenNearExpiration();
+        }
       }
 
       return null;
