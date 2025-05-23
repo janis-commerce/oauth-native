@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.8.0] - 2025-05-27
+
+### Added
+
+- isTokenExpired util in order to check tokens expiration
+
+### Changed
+
+- default values for withTokensExpirationAccess hoc.
+
 ### [v.1.7.0] - 2025-05-14
 
 ### Changed
