@@ -5,8 +5,15 @@
   "moduleDirectories": ["node_modules", "src"],
   "clearMocks": true,
   "moduleFileExtensions": ["js", "jsx", "json"],
-  "testMatch": ["**/__tests__/**/*.js?(x)", "**/?(*.)+(spec|test).js?(x)", "**/__tests__/**/*.test.js"],
+  "testMatch": [
+    "**/__tests__/**/*.js?(x)",
+    "**/?(*.)+(spec|test).js?(x)",
+    "**/__tests__/**/*.test.js"
+  ],
   "setupFilesAfterEnv": ["./jest.setup.js"],
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@react-native|react-native|@react-navigation|react-native-inappbrowser-reborn)/)"
+  ],
   "coverageReporters": ["html", "text", "lcov"],
   "coverageDirectory": "coverage",
   "collectCoverageFrom": [
