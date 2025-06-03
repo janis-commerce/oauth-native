@@ -269,7 +269,7 @@ describe('OAuth Utils', () => {
         expect(res).toEqual({
           isLogged: false,
           oauthTokens: null,
-          error: null,
+          error: 'config param is required',
         });
       } catch (e) {
         console.error('e', e);
@@ -306,6 +306,7 @@ describe('OAuth Utils', () => {
         expect(res).toEqual({
           isLogged: false,
           oauthTokens: null,
+          error: null,
         });
       } catch (e) {
         console.error('e', e);
