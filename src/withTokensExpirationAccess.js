@@ -1,4 +1,5 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {getTokensCache} from './utils/oauth';
 import {useOauthData} from './useOauthData';
 
@@ -38,6 +39,7 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
   props,
 ) => {
   const {handleLogout: logout} = useOauthData();
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
 
   const {
     minutesToConsiderTokenAsNearExpiration = null,
@@ -84,13 +86,22 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
 
       return null;
     } catch (error) {
-      return console.error('Error verifying token expiration:', error);
+      console.error('Error verifying token expiration:', error);
+      return null;
+    } finally {
+      setIsCheckingToken(false);
     }
   };
 
-  useEffect(() => {
-    checkTokenExpiration();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      checkTokenExpiration();
+    }, [checkTokenExpiration]),
+  );
+
+  if (isCheckingToken) {
+    return null;
+  }
 
   return <Component {...props} />;
 };

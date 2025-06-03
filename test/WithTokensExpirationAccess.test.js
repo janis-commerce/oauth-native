@@ -13,6 +13,21 @@ jest.mock('../src/useOauthData', () => ({
   useOauthData: jest.fn(),
 }));
 
+// Add this mock for @react-navigation/native
+jest.mock('@react-navigation/native', () => {
+  const actualNav = jest.requireActual('@react-navigation/native');
+  const ActualReact = jest.requireActual('react'); // Use a different name to avoid conflict
+  return {
+    ...actualNav,
+    useFocusEffect: jest.fn((effect) => {
+      // Simulate running the effect once on mount for testing purposes
+      ActualReact.useEffect(() => {
+        effect();
+      }, []); // Empty dependency array to run only once
+    }),
+  };
+});
+
 const mockLogout = jest.fn();
 const mockOnTokenNearExpiration = jest.fn();
 const mockOnTokenExpired = jest.fn();
