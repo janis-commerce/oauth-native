@@ -48,7 +48,7 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
     onTokenExpired = () => {},
   } = config;
 
-  const checkTokenExpiration = async () => {
+  const checkTokenExpiration = useCallback(async () => {
     try {
       const {expiration} = await getTokensCache();
 
@@ -91,7 +91,13 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
     } finally {
       setIsCheckingToken(false);
     }
-  };
+  }, [
+    minutesToConsiderTokenAsNearExpiration,
+    minutesToConsiderTokenAsExpired,
+    onTokenNearExpiration,
+    onTokenExpired,
+    logout,
+  ]);
 
   useFocusEffect(
     useCallback(() => {
