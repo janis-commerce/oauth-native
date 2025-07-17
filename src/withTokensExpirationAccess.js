@@ -32,6 +32,7 @@ const minutesToMs = (minutes) => minutes * 60 * 1000;
  *   and strictly greater than `minutesToConsiderTokenAsExpired`. Defaults to null, disabling near expiration check.
  * @param {function} [config.onTokenNearExpiration] - Callback executed when the token is in the pre-expiration window.
  * @param {function} [config.onTokenExpired] - Callback executed when the token is expired.
+ * @param {function} [config.renderLoadingComponent] - Function that returns a React component to render while the HOC is loading (when executing the onTokenExpired callback). Defaults to a function that returns null.
  *
  * @returns {React.Component} The wrapped component with token expiration access logic.
  */
@@ -40,12 +41,14 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
 ) => {
   const {handleLogout: logout} = useOauthData();
   const [isCheckingToken, setIsCheckingToken] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     minutesToConsiderTokenAsNearExpiration = null,
     minutesToConsiderTokenAsExpired = 0,
     onTokenNearExpiration = () => {},
     onTokenExpired = () => {},
+    renderLoadingComponent = () => null,
   } = config;
 
   const checkTokenExpiration = useCallback(async () => {
@@ -60,7 +63,9 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
 
       // Check if token is expired
       if (currentTime >= expirationThresholdTime) {
-        onTokenExpired();
+        setIsLoading(true);
+        await onTokenExpired();
+        setIsLoading(false);
         return logout();
       }
 
@@ -104,6 +109,10 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
       checkTokenExpiration();
     }, [checkTokenExpiration]),
   );
+
+  if (isLoading) {
+    return renderLoadingComponent();
+  }
 
   if (isCheckingToken) {
     return null;
