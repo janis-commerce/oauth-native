@@ -132,6 +132,34 @@ describe('withTokensExpirationAccess', () => {
       expect(mockLogout).toHaveBeenCalled();
       expect(mockOnTokenNearExpiration).not.toHaveBeenCalled();
     });
+
+    it('calls onTokenExpired (if provided) which throws an error and logout if token is expired', async () => {
+      const expirationTime = Date.now(); // Token is expired
+      const errorMessage = 'Error in onTokenExpired';
+
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {}); // Suppress console output
+
+      const throwingOnTokenExpired = jest.fn(() => {
+        throw new Error(errorMessage);
+      });
+
+      await renderHelper(
+        {onTokenExpired: throwingOnTokenExpired},
+        expirationTime,
+      );
+
+      expect(throwingOnTokenExpired).toHaveBeenCalled();
+      expect(mockLogout).toHaveBeenCalled();
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error executing onTokenExpired callback:',
+        expect.any(Error),
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   describe('MTNE > MTE (Near Expiration Active)', () => {
