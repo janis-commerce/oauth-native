@@ -66,10 +66,10 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
         try {
           setIsLoading(true);
           await onTokenExpired();
-          setIsLoading(false);
         } catch (error) {
           console.error('Error executing onTokenExpired callback:', error);
         } finally {
+          setIsLoading(false);
           logout();
         }
       }
