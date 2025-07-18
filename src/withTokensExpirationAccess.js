@@ -63,10 +63,15 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
 
       // Check if token is expired
       if (currentTime >= expirationThresholdTime) {
-        setIsLoading(true);
-        await onTokenExpired();
-        setIsLoading(false);
-        return logout();
+        try {
+          setIsLoading(true);
+          await onTokenExpired();
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error executing onTokenExpired callback:', error);
+        } finally {
+          logout();
+        }
       }
 
       const isMinutesNearExpirationValid =
