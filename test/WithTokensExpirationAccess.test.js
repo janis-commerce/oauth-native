@@ -146,7 +146,10 @@ describe('withTokensExpirationAccess', () => {
       });
 
       await renderHelper(
-        {onTokenExpired: throwingOnTokenExpired},
+        {
+          onTokenExpired: throwingOnTokenExpired,
+          renderLoadingComponent: () => <></>,
+        },
         expirationTime,
       );
 
