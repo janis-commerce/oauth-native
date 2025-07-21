@@ -48,7 +48,7 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
     minutesToConsiderTokenAsExpired = 0,
     onTokenNearExpiration = () => {},
     onTokenExpired = () => {},
-    renderLoadingComponent = () => null,
+    renderLoadingComponent,
   } = config;
 
   const checkTokenExpiration = useCallback(async () => {
@@ -115,7 +115,7 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
     }, [checkTokenExpiration]),
   );
 
-  if (isLoading) {
+  if (isLoading && renderLoadingComponent) {
     return renderLoadingComponent();
   }
 
