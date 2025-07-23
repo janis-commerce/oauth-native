@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.10.0] - 2025-07-21
+
+### Added
+
+- Added await to onTokenExpiration callback on the withTokensExpirationAccess HOC as well a new prop to render a loading componente
+
 ### [v.1.9.1] - 2025-06-03
 
 ### Fixed
