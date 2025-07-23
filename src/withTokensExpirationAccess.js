@@ -77,6 +77,7 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
         } finally {
           setIsLoading(false);
           logout();
+          hasRunTokenExpired.current = false;
         }
       }
 
