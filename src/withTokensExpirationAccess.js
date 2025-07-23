@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import {getTokensCache} from './utils/oauth';
 import {useOauthData} from './useOauthData';
@@ -51,6 +51,8 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
     renderLoadingComponent,
   } = config;
 
+  const hasRunTokenExpired = useRef(false);
+
   const checkTokenExpiration = useCallback(async () => {
     try {
       const {expiration} = await getTokensCache();
@@ -62,7 +64,11 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
         expirationTimeInMs - minutesToMs(minutesToConsiderTokenAsExpired);
 
       // Check if token is expired
-      if (currentTime >= expirationThresholdTime) {
+      if (
+        currentTime >= expirationThresholdTime &&
+        !hasRunTokenExpired.current
+      ) {
+        hasRunTokenExpired.current = true;
         try {
           setIsLoading(true);
           await onTokenExpired();
