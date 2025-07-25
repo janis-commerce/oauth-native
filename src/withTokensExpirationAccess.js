@@ -75,9 +75,9 @@ export const withTokensExpirationAccess = (Component, config = {}) => (
         } catch (error) {
           console.error('Error executing onTokenExpired callback:', error);
         } finally {
-          setIsLoading(false);
-          logout();
           hasRunTokenExpired.current = false;
+          logout();
+          setIsLoading(false);
         }
       }
 
