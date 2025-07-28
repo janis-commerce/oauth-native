@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.10.2] - 2025-07-28
+
+### Fixed
+
+- An error that was causing an additional re-render when using withTokensExpirationAccess hoc
+
 ### [v.1.10.1] - 2025-07-24
 
 ### Fixed
