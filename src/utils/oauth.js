@@ -74,7 +74,6 @@ export const getTokensCache = async () => {
   );
 
   const oauthTokens = parseJson(res);
-
   return {oauthTokens, expiration};
 };
 
@@ -151,12 +150,16 @@ export const getAuthData = async (config = {}) => {
     const {oauthTokens, expiration} = await getTokensCache();
 
     const {refreshToken = ''} = oauthTokens || {};
+    const currentTokensAreExpired = isExpired(expiration);
 
-    if (refreshToken && isExpired(expiration)) {
-      const newTokens = await refreshAuthToken(refreshToken, config);
+    if (refreshToken && currentTokensAreExpired) {
+      const {scopes, ...restConfig} = config;
+      const newTokens = await refreshAuthToken(refreshToken, restConfig);
 
       return getLoginObj(newTokens);
     }
+
+    if (currentTokensAreExpired) throw new Error('oauth tokens are expired');
 
     return getLoginObj(oauthTokens);
   } catch (error) {

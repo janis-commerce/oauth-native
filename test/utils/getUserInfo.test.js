@@ -1,8 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as jwtDecode from 'jwt-decode';
 import jwtDecodeUserMock from '../../mocks/jwt-decode';
 import {getUserInfo} from '../../src/utils/getUserInfo';
-import keys from '../../src/keys';
 import * as oauth from '../../src/utils/oauth';
 
 jest.mock('jwt-decode', () => {
@@ -23,9 +21,11 @@ jest.mock('jwt-decode', () => {
 describe('getUserInfo', () => {
   describe('throws error with', () => {
     it('with no get oauth tokens', async () => {
-      jest
-        .spyOn(AsyncStorage, 'getItem')
-        .mockReturnValueOnce(keys.OAUTH_TOKENS_KEY);
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        isLogged: false,
+        oauthTokens: {},
+        error: null,
+      });
 
       try {
         await getUserInfo();
@@ -35,9 +35,13 @@ describe('getUserInfo', () => {
     });
 
     it('with no get id token', async () => {
-      jest
-        .spyOn(AsyncStorage, 'getItem')
-        .mockReturnValueOnce({example: 'example'});
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        isLogged: true,
+        oauthTokens: {
+          accessToken: 'access-token-1',
+        },
+        error: null,
+      });
 
       try {
         await getUserInfo();
@@ -46,7 +50,11 @@ describe('getUserInfo', () => {
       }
     });
     it('obtains null oauthData or this is not an object', async () => {
-      jest.spyOn(AsyncStorage, 'getItem').mockReturnValueOnce(null);
+      oauth.getAuthData = jest.fn().mockReturnValueOnce({
+        isLogged: false,
+        oauthTokens: null,
+        error: null,
+      });
 
       try {
         await getUserInfo();

@@ -214,40 +214,35 @@ describe('OAuth Utils', () => {
       expect(res).toEqual({
         isLogged: false,
         oauthTokens: null,
-        error: null,
+        error: 'oauth tokens are expired',
       });
     });
 
     it('must return object with isLogged boolean and oauthTokens', async () => {
-      try {
-        const date = new Date(Date.now() - 50000).toDateString();
+      const date = new Date(Date.now() + 500000000).toDateString();
+      await storeTokensCache({
+        accessTokenExpirationDate: date,
+        tokenType: 'Bearer',
+        expiresIn: 172799,
+        scope: 'openid profile email oms:order:read',
+        accessToken: 'access-token-1',
+        idToken: 'id-token-1',
+      });
 
-        await storeTokensCache({
+      const res = await getAuthData();
+
+      expect(res).toEqual({
+        isLogged: true,
+        oauthTokens: {
           accessTokenExpirationDate: date,
           tokenType: 'Bearer',
           expiresIn: 172799,
           scope: 'openid profile email oms:order:read',
           accessToken: 'access-token-1',
           idToken: 'id-token-1',
-        });
-
-        const res = await getAuthData();
-
-        expect(res).toEqual({
-          isLogged: true,
-          oauthTokens: {
-            accessTokenExpirationDate: date,
-            tokenType: 'Bearer',
-            expiresIn: 172799,
-            scope: 'openid profile email oms:order:read',
-            accessToken: 'access-token-1',
-            idToken: 'id-token-1',
-          },
-          error: null,
-        });
-      } catch (error) {
-        console.error(error);
-      }
+        },
+        error: null,
+      });
     });
 
     it('must return object with isLogged false and null tokens data', async () => {
@@ -265,15 +260,11 @@ describe('OAuth Utils', () => {
 
       const res = await getAuthData();
 
-      try {
-        expect(res).toEqual({
-          isLogged: false,
-          oauthTokens: null,
-          error: 'config param is required',
-        });
-      } catch (e) {
-        console.error('e', e);
-      }
+      expect(res).toEqual({
+        isLogged: false,
+        oauthTokens: null,
+        error: 'config param is required',
+      });
     });
 
     it('must return object with isLogged false and null tokens data', async () => {
