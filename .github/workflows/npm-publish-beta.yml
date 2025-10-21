@@ -11,21 +11,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
         with:
-          node-version: '18'
+          node-version: 12
           cache: 'npm'
-          registry-url: https://registry.npmjs.org/
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linting
-        run: npm run lint
+      - run: npm i
+      - run: npm test
 
   publish-npm:
     needs: build
@@ -33,17 +25,17 @@ jobs:
     environment: beta
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v1
         with:
-          node-version: '18'
+          node-version: 12
           cache: 'npm'
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: npm ci
+        run: npm i
 
       - name: Determine npm tag
         id: npm-tag
