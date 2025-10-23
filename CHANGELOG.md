@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.11.0-beta.4] - 2025-10-23
+
+### Changed
+
+- removed logout utility export
+
 ### [v.1.11.0-beta.3] - 2025-10-22
 
 ### Added
