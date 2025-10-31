@@ -52,20 +52,3 @@ jobs:
         run: npm publish --tag ${{ steps.npm-tag.outputs.tag }} --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-
-  send-slack-message:
-    needs: publish-npm
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Send beta release notification
-        run: bash ./scripts/release-notes.sh
-        env:
-          RELEASE_SLACK_WEBHOOK_URL: ${{ secrets.RELEASE_SLACK_WEBHOOK_URL }}

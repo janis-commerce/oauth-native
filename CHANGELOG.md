@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- npm publish beta worklflow config
+- npm publish beta workflow config
 
 ### [v.1.11.0-beta.1] - 2025-10-21
 
