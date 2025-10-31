@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.11.0] - 2025-11-06
+
+### Added
+
+- Support up to react 19
+
 ### [v.1.10.2] - 2025-07-28
 
 ### Fixed
