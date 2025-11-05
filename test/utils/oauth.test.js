@@ -188,7 +188,7 @@ describe('OAuth Utils', () => {
         idToken: 'id-token-1',
       };
 
-      const loginData = getLoginObj(tokensMock);
+      const loginData = getLoginObj(tokensMock, null);
 
       expect(loginData).toEqual({
         isLogged: true,
@@ -203,7 +203,7 @@ describe('OAuth Utils', () => {
       expect(loginData).toEqual({
         isLogged: false,
         oauthTokens: null,
-        error: null,
+        error: 'Authentication failed',
       });
     });
   });
@@ -214,7 +214,7 @@ describe('OAuth Utils', () => {
       expect(res).toEqual({
         isLogged: false,
         oauthTokens: null,
-        error: 'oauth tokens are expired',
+        error: 'Authentication failed',
       });
     });
 

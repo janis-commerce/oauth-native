@@ -133,7 +133,7 @@ export const userAuthorize = async (config = {}) => {
  * @param {object} tokens - oauth tokens
  * @returns {object} - object with user login data
  */
-export const getLoginObj = (tokens, error = null) => ({
+export const getLoginObj = (tokens, error = 'Authentication failed') => ({
   isLogged: !!tokens,
   oauthTokens: tokens || null,
   error,
@@ -156,12 +156,12 @@ export const getAuthData = async (config = {}) => {
       const {scopes, ...restConfig} = config;
       const newTokens = await refreshAuthToken(refreshToken, restConfig);
 
-      return getLoginObj(newTokens);
+      return getLoginObj(newTokens, null);
     }
 
-    if (currentTokensAreExpired) throw new Error('oauth tokens are expired');
+    if (currentTokensAreExpired) throw new Error('Authentication failed');
 
-    return getLoginObj(oauthTokens);
+    return getLoginObj(oauthTokens, null);
   } catch (error) {
     return getLoginObj(null, error.message);
   }
