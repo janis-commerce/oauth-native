@@ -7,29 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
-### [v.1.11.0-beta.4] - 2025-10-23
-
-### Changed
-
-- removed logout utility export
-
-### [v.1.11.0-beta.3] - 2025-10-22
+### [v.1.11.0] - 2025-11-06
 
 ### Added
 
-- export of the logout utility
-
-### [v.1.11.0-beta.2] - 2025-10-21
-
-### Changed
-
-- npm publish beta workflow config
-
-### [v.1.11.0-beta.1] - 2025-10-21
-
-### Added
-
-- validation to return an expired token error when the current OAuth tokens are expired
+- Support up to react 19
 
 ### [v.1.10.2] - 2025-07-28
 

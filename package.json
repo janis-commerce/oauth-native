@@ -1,6 +1,6 @@
 {
   "name": "@janiscommerce/oauth-native",
-  "version": "1.11.0-beta.4",
+  "version": "1.11.0",
   "main": "src/index.js",
   "react-native": "src/index.js",
   "files": [
@@ -23,7 +23,7 @@
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",
-    "@testing-library/react": "^11.2.5",
+    "@testing-library/react-native": "^9.1.0",
     "@testing-library/react-hooks": "^5.1.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^25.1.0",
@@ -48,8 +48,8 @@
     "@react-navigation/native": "^6.1.6"
   },
   "peerDependencies": {
-    "react": ">= 16.13.1",
-    "react-native": ">= 0.63.4",
+    "react": ">=16.13.1 <19.0.0",
+    "react-native": ">=0.63.4 <0.75.0",
     "react-native-app-auth": "^6.2.0",
     "react-native-inappbrowser-reborn": "^3.5.1",
     "@react-navigation/native": "^6.1.6"
