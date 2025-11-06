@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [v.1.12.0] - 2025-11-06
+
+### Changed
+
+- improved OAuth handling: clearer authentication failure messaging, explicit expired-token flows, and automatic token refresh when applicable.
+- auth-related tests to use a consolidated OAuth data accessor and simplified test flows.
+
 ### [v.1.11.0] - 2025-11-06
 
 ### Added
