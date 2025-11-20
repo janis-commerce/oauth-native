@@ -210,7 +210,6 @@ export const isUserDev = async () => {
   try {
     const {oauthTokens} = await getTokensCache();
     const {idToken = ''} = oauthTokens || {};
-    console.log('idToken', idToken);
     const decoded = jwtDecode(idToken);
     return decoded?.isDev;
   } catch (reason) {
