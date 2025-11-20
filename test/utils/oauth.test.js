@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {refresh, authorize} from 'react-native-app-auth';
+import jwtDecode from 'jwt-decode';
 import {
   storeTokensCache,
   parseExpirationDate,
@@ -11,8 +12,11 @@ import {
   getLoginObj,
   clearAuthorizeTokens,
   isTokenExpired,
+  isUserDev,
 } from '../../src/utils/oauth';
 import keys from '../../src/keys';
+
+jest.mock('jwt-decode');
 
 describe('OAuth Utils', () => {
   beforeEach(() => {
@@ -363,6 +367,51 @@ describe('OAuth Utils', () => {
           Promise.reject(new Error('AsyncStorage error')),
         );
       expect(await isTokenExpired()).toBe(false);
+    });
+  });
+
+  describe('isUserDev', () => {
+    it('should return isDev value from decoded token', async () => {
+      AsyncStorage.setItem(
+        keys.OAUTH_TOKENS_KEY,
+        JSON.stringify({idToken: 'mock.token'}),
+      );
+
+      jwtDecode.mockReturnValue({isDev: true});
+      expect(await isUserDev()).toBe(true);
+
+      jwtDecode.mockReturnValue({isDev: false});
+      expect(await isUserDev()).toBe(false);
+    });
+
+    it('should reject if idToken is missing', async () => {
+      AsyncStorage.setItem(
+        keys.OAUTH_TOKENS_KEY,
+        JSON.stringify({accessToken: 'token'}),
+      );
+      jwtDecode.mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
+
+      try {
+        await isUserDev();
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error).toBeDefined();
+      }
+    });
+
+    it('should reject if oauthTokens is null', async () => {
+      jwtDecode.mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
+
+      try {
+        await isUserDev();
+        expect(true).toBe(false);
+      } catch (error) {
+        expect(error).toBeDefined();
+      }
     });
   });
 });

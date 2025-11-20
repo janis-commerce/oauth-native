@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {refresh, authorize} from 'react-native-app-auth';
+import jwtDecode from 'jwt-decode';
 import {parseJson, stringifyJson} from './json';
 import keys from '../keys';
 
@@ -196,5 +197,23 @@ export const isTokenExpired = async () => {
     return isExpired(expiration);
   } catch (reason) {
     return false;
+  }
+};
+
+/**
+ * @name isUserDev
+ * @description Asynchronously checks if the user is a developer by retrieving the isDev property from the token.
+ * @async
+ * @returns {Promise<boolean>} - Resolves to true if the user is a developer, false otherwise.
+ */
+export const isUserDev = async () => {
+  try {
+    const {oauthTokens} = await getTokensCache();
+    const {idToken = ''} = oauthTokens || {};
+    console.log('idToken', idToken);
+    const decoded = jwtDecode(idToken);
+    return decoded?.isDev;
+  } catch (reason) {
+    return Promise.reject(reason);
   }
 };
