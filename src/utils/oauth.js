@@ -209,10 +209,10 @@ export const isTokenExpired = async () => {
 export const isUserDev = async () => {
   try {
     const {oauthTokens} = await getTokensCache();
-    const {idToken = ''} = oauthTokens || {};
+    const {idToken = ''} = oauthTokens ?? {};
     const decoded = jwtDecode(idToken);
-    return decoded?.isDev;
-  } catch (reason) {
-    return Promise.reject(reason);
+    return !!decoded?.isDev;
+  } catch {
+    return false;
   }
 };
