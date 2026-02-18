@@ -16,7 +16,7 @@ import {AuthContext} from './context';
  *    )
  * }
  */
-const AuthProvider = ({logoutUrl, config, ...rest}) => {
+const AuthProvider = ({logoutUrl = '', config, ...rest}) => {
   const oauth = useOauth(config, logoutUrl);
 
   return <AuthContext.Provider logoutUrl={logoutUrl} {...rest} value={oauth} />;
@@ -36,10 +36,6 @@ AuthProvider.propTypes = {
    * Url to open in app browser to logout user
    */
   logoutUrl: string,
-};
-
-AuthProvider.defaultProps = {
-  logoutUrl: '',
 };
 
 export default AuthProvider;
