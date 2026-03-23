@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Changed
+- Moved @react-native-async-storage/async-storage from dependencies to peerDependencies
+- Replaced AuthProvider.defaultProps with default parameters for React 19 compatibility
+- Widened react-native peer dependency range to >=0.71.5 <0.82.0
+- Widened react peer dependency range to >=16.13.1 <20.0.0
+- Widened @react-navigation/native peer dependency to >=6.1.6
+- Standardized Node.js to v22 in .nvmrc and all CI workflows
+- Upgraded GitHub Actions to v4 (checkout, setup-node)
+
 ### [1.13.0] - 2025-11-21
 
 ### Added
