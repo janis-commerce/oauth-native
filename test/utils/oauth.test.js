@@ -13,7 +13,9 @@ import {
   clearAuthorizeTokens,
   isTokenExpired,
   isUserDev,
+  isUserDevSync,
 } from '../../src/utils/oauth';
+import storage from '../../src/storage';
 import keys from '../../src/keys';
 
 jest.mock('jwt-decode');
@@ -21,6 +23,8 @@ jest.mock('jwt-decode');
 describe('OAuth Utils', () => {
   beforeEach(() => {
     AsyncStorage.clear();
+    jwtDecode.mockReset();
+    jwtDecode.mockReturnValue({});
   });
 
   describe('parseExpirationDate', () => {
@@ -84,6 +88,71 @@ describe('OAuth Utils', () => {
       } catch (error) {
         expect(error).not.toBeUndefined();
       }
+    });
+
+    it('must store isDev=true in app-storage when JWT has isDev=true', async () => {
+      jwtDecode.mockReturnValue({isDev: true});
+
+      const tokensMock = {
+        accessTokenExpirationDate: 'Mon Mar 22 2021 20:08:27 GMT-0300',
+        idToken: 'valid-token',
+      };
+
+      await storeTokensCache(tokensMock);
+
+      expect(storage.set).toBeCalledWith('isUserDev', true);
+    });
+
+    it('must store isDev=false in app-storage when JWT has isDev=false', async () => {
+      jwtDecode.mockReturnValue({isDev: false});
+
+      const tokensMock = {
+        accessTokenExpirationDate: 'Mon Mar 22 2021 20:08:27 GMT-0300',
+        idToken: 'valid-token',
+      };
+
+      await storeTokensCache(tokensMock);
+
+      expect(storage.set).toBeCalledWith('isUserDev', false);
+    });
+
+    it('must store isDev=false in app-storage when JWT has no isDev', async () => {
+      jwtDecode.mockReturnValue({});
+
+      const tokensMock = {
+        accessTokenExpirationDate: 'Mon Mar 22 2021 20:08:27 GMT-0300',
+        idToken: 'valid-token',
+      };
+
+      await storeTokensCache(tokensMock);
+
+      expect(storage.set).toBeCalledWith('isUserDev', false);
+    });
+
+    it('must use empty string as idToken default when not provided', async () => {
+      const tokensMock = {
+        accessTokenExpirationDate: 'Mon Mar 22 2021 20:08:27 GMT-0300',
+      };
+
+      await storeTokensCache(tokensMock);
+
+      expect(jwtDecode).toBeCalledWith('');
+      expect(storage.set).toBeCalledWith('isUserDev', false);
+    });
+
+    it('must reject when idToken decode fails', async () => {
+      jwtDecode.mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
+
+      const tokensMock = {
+        accessTokenExpirationDate: 'Mon Mar 22 2021 20:08:27 GMT-0300',
+        idToken: 'invalid-token',
+      };
+
+      await expect(storeTokensCache(tokensMock)).rejects.toThrow(
+        'Invalid token',
+      );
     });
   });
 
@@ -319,6 +388,12 @@ describe('OAuth Utils', () => {
       );
     });
 
+    it('must remove isUserDev from app-storage', async () => {
+      await clearAuthorizeTokens();
+
+      expect(storage.remove).toBeCalledWith('isUserDev');
+    });
+
     it('must return true if data was cleared', async () => {
       const res = await clearAuthorizeTokens();
 
@@ -412,6 +487,35 @@ describe('OAuth Utils', () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
+    });
+  });
+
+  describe('isUserDevSync', () => {
+    it('should return true when storage has isUserDev=true', () => {
+      storage.get.mockReturnValue(true);
+
+      expect(isUserDevSync()).toBe(true);
+      expect(storage.get).toBeCalledWith('isUserDev');
+    });
+
+    it('should return false when storage has isUserDev=false', () => {
+      storage.get.mockReturnValue(false);
+
+      expect(isUserDevSync()).toBe(false);
+    });
+
+    it('should return false when storage has no isUserDev key', () => {
+      storage.get.mockReturnValue(undefined);
+
+      expect(isUserDevSync()).toBe(false);
+    });
+
+    it('should return false when storage.get throws an error', () => {
+      storage.get.mockImplementation(() => {
+        throw new Error('Storage error');
+      });
+
+      expect(isUserDevSync()).toBe(false);
     });
   });
 });
