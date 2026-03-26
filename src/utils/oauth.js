@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {refresh, authorize} from 'react-native-app-auth';
 import jwtDecode from 'jwt-decode';
+import storage from '../storage';
 import {parseJson, stringifyJson} from './json';
 import keys from '../keys';
 
@@ -54,6 +55,10 @@ export const storeTokensCache = async (oauthTokens) => {
       keys.OAUTH_TOKENS_EXPIRATION_KEY,
       stringifyJson(expiration),
     );
+
+    const {idToken = ''} = oauthTokens;
+    const decoded = jwtDecode(idToken);
+    storage.set('isUserDev', !!decoded?.isDev);
 
     return true;
   } catch (error) {
@@ -178,6 +183,7 @@ export const clearAuthorizeTokens = async () => {
   try {
     await AsyncStorage.removeItem(keys.OAUTH_TOKENS_KEY);
     await AsyncStorage.removeItem(keys.OAUTH_TOKENS_EXPIRATION_KEY);
+    storage.remove('isUserDev');
 
     return true;
   } catch (reason) {
@@ -212,6 +218,19 @@ export const isUserDev = async () => {
     const {idToken = ''} = oauthTokens ?? {};
     const decoded = jwtDecode(idToken);
     return !!decoded?.isDev;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * @name isUserDevSync
+ * @description Synchronously checks if the user is a developer by reading the cached isDev value from app-storage.
+ * @returns {boolean} - true if the user is a developer, false otherwise.
+ */
+export const isUserDevSync = () => {
+  try {
+    return !!storage.get('isUserDev');
   } catch {
     return false;
   }
