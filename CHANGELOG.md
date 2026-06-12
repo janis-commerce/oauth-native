@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Changed
+- Widened react-native-app-auth peer dependency to >=6.2.0 <9, allowing apps to upgrade to v7.1.1+ which fixes a fatal NPE on Android (`onActivityResult` after process death during the login flow)
+
 ### [1.13.0] - 2025-11-21
 
 ### Added
