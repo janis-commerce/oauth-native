@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [unreleased]
 
 ### Changed
-- Raised react-native-app-auth peer dependency to >=7.1.1 <9, requiring the version that fixes a fatal NPE on Android (`onActivityResult` after process death during the login flow) and unblocking apps to upgrade up to v8
+- Raised react-native-app-auth peer dependency to >=7.1.1 <8.4.0, requiring the version that fixes a fatal NPE on Android (`onActivityResult` after process death during the login flow) and unblocking apps to upgrade up to 8.3.x. 8.4.0 is excluded because it bumps AndroidX Browser to 1.9.0, requiring compileSdk 36 / AGP 8.9.1, above the apps' current setup.
 
 ### [1.13.0] - 2025-11-21
 
