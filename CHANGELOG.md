@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [2.0.0] - 2026-09-29
+
 ### Changed
+
 - Raised react-native-app-auth peer dependency to >=7.1.1 <8.4.0, requiring the version that fixes a fatal NPE on Android (`onActivityResult` after process death during the login flow) and unblocking apps to upgrade up to 8.3.x. 8.4.0 is excluded because it bumps AndroidX Browser to 1.9.0, requiring compileSdk 36 / AGP 8.9.1, above the apps' current setup.
 - Moved @react-native-async-storage/async-storage from dependencies to peerDependencies
 - Replaced AuthProvider.defaultProps with default parameters for React 19 compatibility
