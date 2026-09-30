@@ -45,7 +45,8 @@
     "react-native-app-auth": "~8.3.0",
     "react-native-inappbrowser-reborn": "^3.5.1",
     "@react-navigation/native": "^6.1.6",
-    "@react-native-async-storage/async-storage": "^1.14.1"
+    "@react-native-async-storage/async-storage": "^1.14.1",
+    "react-native-keychain": "10.0.0"
   },
   "peerDependencies": {
     "react": ">=16.13.1 <20.0.0",
@@ -53,7 +54,8 @@
     "react-native-app-auth": ">=7.1.1 <8.4.0",
     "react-native-inappbrowser-reborn": "^3.5.1",
     "@react-navigation/native": ">=6.1.6",
-    "@react-native-async-storage/async-storage": ">=1.14.1"
+    "@react-native-async-storage/async-storage": ">=1.14.1",
+    "react-native-keychain": "10.0.0"
   },
   "jest": {
     "preset": "react-native"
