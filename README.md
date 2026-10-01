@@ -5,13 +5,21 @@ Wrapper package to handle Janis OAuth module.
 [![Coverage Status](https://github.com/janis-commerce/oauth-native/actions/workflows/coverage-status.yml/badge.svg)](https://github.com/janis-commerce/oauth-native/actions/workflows/coverage-status.yml)
 [![npm version](https://badge.fury.io/js/%40janiscommerce%2Foauth-native.svg)](https://badge.fury.io/js/%40janiscommerce%2Foauth-native)
 
-> ⚠️ **Peer dependencies**: You must install react-native-app-auth: "^6.2.0", react-native-inappbrowser-reborn: "^3.5.1" and @react-navigation/native: "^6.1.6" before using this package.
+> ⚠️ **Peer dependencies**: You must install react-native-app-auth: ">=7.1.1 <8.4.0", react-native-inappbrowser-reborn: "^3.5.1", @react-navigation/native: ">=6.1.6", @react-native-async-storage/async-storage: ">=1.14.1" and react-native-keychain: "10.0.0" before using this package. react-native-keychain is a native module: rebuild the app after installing it.
 
 ## Installation
 
 ```
 npm install @janiscommerce/oauth-native
 ```
+
+## Upgrading to 3.x
+
+The session is now stored in the device secure storage (Android Keystore / iOS Keychain) instead of AsyncStorage.
+
+- Install `react-native-keychain` `10.0.0` and rebuild the native app. Without it the session can be neither saved nor read.
+- Sessions saved by 2.x are migrated on the first read, so users stay logged in.
+- Code that reads the `oauthTokens` key from AsyncStorage no longer finds the session: use `getAccessToken`, `getUserInfo` or `getAuthData`.
 
 ## Usage
 
@@ -88,7 +96,7 @@ const ChildrenComponent = () => {
 | state           | Type           | description                                                          |
 | --------------- | -------------- | -------------------------------------------------------------------- |
 | oauthTokens     | object         | all tokens obtained from authentication server                       |
-| handleLogout    | function       | open a in App browser with logout url and clean async storage tokens |
+| handleLogout    | function       | open a in App browser with logout url and clear the stored session |
 | handleAuthorize | function       | open a in App browser to authenticate user                           |
 | userData        | object         | user data from openId Connect                                        |
 | isLogged        | boolean        | info about if user is logged                                         |
