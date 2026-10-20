@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### [3.0.0-beta.2] - 2026-10-20
+
+### Changed
+
+- Calls that ask for the session while it is still being read from the secure storage at app start now wait for that same read, so the secure storage is read, and an old AsyncStorage session migrated, only once per app process
+- A failed write to the secure storage is retried once, so a transient error no longer loses the session on the next app start
+- Widened the `react-native-keychain` peer dependency from `10.0.0` to `^10.0.0`, so apps can take its patch and minor updates
+
+### [3.0.0-beta.1] - 2026-09-30
+
 ### Changed
 
 - The user session (access token, id token and expiration) is now stored encrypted in the device secure storage (Android Keystore / iOS Keychain) instead of in plain text in AsyncStorage, so it can no longer be read from the app's private files with root or physical access to the device. After the first read in each app process the session is served from memory, so requests do not wait on the secure storage

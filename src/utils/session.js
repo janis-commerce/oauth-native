@@ -10,9 +10,11 @@ const ASYNC_STORAGE_KEYS = [
 ];
 
 // A keychain read costs ~270ms, so it is read once per process and then served from memory.
-// Calls that arrive before the first read ends read the keychain too: accepted to keep this
-// simple, it only happens at startup.
 let session;
+// Calls that arrive during that read share it, so the keychain is read and migrated once.
+// A logout during the read is not covered: the read ends later and puts the session back in
+// memory. Accepted to keep this simple: it needs a logout in the first ~270ms of the process.
+let pendingRead;
 
 /**
  * @name setSession
@@ -25,11 +27,15 @@ export const setSession = (newSession) => {
   // Memory first: callers don't await this, and requests must not read the old session meanwhile.
   session = newSession;
 
-  return Keychain.setGenericPassword(
-    keys.OAUTH_TOKENS_KEY,
-    stringifyJson(newSession),
-    KEYCHAIN_OPTIONS,
-  );
+  const writeKeychain = () =>
+    Keychain.setGenericPassword(
+      keys.OAUTH_TOKENS_KEY,
+      stringifyJson(newSession),
+      KEYCHAIN_OPTIONS,
+    );
+
+  // Retried once like the read: a transient failure would otherwise lose the session on the next start.
+  return writeKeychain().catch(writeKeychain);
 };
 
 const readSession = async () => {
@@ -74,7 +80,13 @@ const readSession = async () => {
 export const getSession = async () => {
   if (session) return session;
 
-  session = await readSession();
+  if (!pendingRead) {
+    pendingRead = readSession().finally(() => {
+      pendingRead = undefined;
+    });
+  }
+
+  session = await pendingRead;
   return session;
 };
 

@@ -53,6 +53,19 @@ describe('Session', () => {
       expect(Keychain.getGenericPassword).toBeCalledTimes(1);
     });
 
+    it('must read keychain once for calls that arrive during the read', async () => {
+      await saveKeychainSession(session);
+
+      const sessions = await Promise.all([
+        getSession(),
+        getSession(),
+        getSession(),
+      ]);
+
+      expect(sessions).toEqual([session, session, session]);
+      expect(Keychain.getGenericPassword).toBeCalledTimes(1);
+    });
+
     it('must retry a failed keychain read once', async () => {
       await saveKeychainSession(session);
       Keychain.getGenericPassword.mockRejectedValueOnce(
@@ -91,6 +104,14 @@ describe('Session', () => {
       ).toBeNull();
     });
 
+    it('must migrate once for calls that arrive during the migration', async () => {
+      await saveAsyncStorageSession();
+
+      await Promise.all([getSession(), getSession()]);
+
+      expect(Keychain.setGenericPassword).toBeCalledTimes(1);
+    });
+
     it('must remove a leftover async storage session when keychain has one', async () => {
       await saveKeychainSession(session);
       await saveAsyncStorageSession();
@@ -111,9 +132,10 @@ describe('Session', () => {
 
     it('must keep async storage and use the old session if the keychain write fails', async () => {
       await saveAsyncStorageSession();
-      Keychain.setGenericPassword.mockRejectedValueOnce(
-        keychainError('E_CRYPTO_FAILED'),
-      );
+      const error = keychainError('E_CRYPTO_FAILED');
+      Keychain.setGenericPassword
+        .mockRejectedValueOnce(error)
+        .mockRejectedValueOnce(error);
 
       expect(await getSession()).toEqual(session);
       expect(await AsyncStorage.getItem(keys.OAUTH_TOKENS_KEY)).toBe(
@@ -142,10 +164,24 @@ describe('Session', () => {
       expect(Keychain.getGenericPassword).not.toBeCalled();
     });
 
-    it('must reject if the keychain write fails, keeping the session in memory', async () => {
+    it('must retry a failed keychain write once', async () => {
       Keychain.setGenericPassword.mockRejectedValueOnce(
         keychainError('E_CRYPTO_FAILED'),
       );
+
+      await setSession(session);
+
+      expect(Keychain.setGenericPassword).toBeCalledTimes(2);
+      expect(await Keychain.getGenericPassword(keychainOptions)).toEqual(
+        expect.objectContaining({password: JSON.stringify(session)}),
+      );
+    });
+
+    it('must reject if the retry fails too, keeping the session in memory', async () => {
+      const error = keychainError('E_CRYPTO_FAILED');
+      Keychain.setGenericPassword
+        .mockRejectedValueOnce(error)
+        .mockRejectedValueOnce(error);
 
       await expect(setSession(session)).rejects.toThrow('E_CRYPTO_FAILED');
       expect(await getSession()).toEqual(session);
