@@ -1,8 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {refresh, authorize} from 'react-native-app-auth';
 import jwtDecode from 'jwt-decode';
-import {parseJson, stringifyJson} from './json';
-import keys from '../keys';
+import {stringifyJson} from './json';
+import {getSession, setSession, clearSession} from './session';
 
 /**
  * @name parseExpirationDate
@@ -32,7 +31,7 @@ export const isExpired = (expiration) => {
 
 /**
  * @name storeTokensCache
- * @description - save user tokens on local device memory (async storage)
+ * @description - save user tokens in the session (memory and keychain)
  * @private
  * @param {object} oauthTokens object with oauth tokens
  * @returns {promise} - resolves with true if data was saved or reject with error if something was failed
@@ -45,15 +44,7 @@ export const storeTokensCache = async (oauthTokens) => {
     if (!expiration)
       throw new Error('oauthTokens.accessTokenExpirationDate is required');
 
-    await AsyncStorage.setItem(
-      keys.OAUTH_TOKENS_KEY,
-      stringifyJson(oauthTokens),
-    );
-
-    await AsyncStorage.setItem(
-      keys.OAUTH_TOKENS_EXPIRATION_KEY,
-      stringifyJson(expiration),
-    );
+    await setSession({oauthTokens, expiration: stringifyJson(expiration)});
 
     return true;
   } catch (error) {
@@ -63,20 +54,11 @@ export const storeTokensCache = async (oauthTokens) => {
 
 /**
  * @name getTokensCache
- * @description - get user tokens from local device memory (async storage)
+ * @description - get user tokens from the session (memory and keychain)
  * @private
  * @returns {promise} - resolve an object with tokens data and expiration
  */
-export const getTokensCache = async () => {
-  const res = await AsyncStorage.getItem(keys.OAUTH_TOKENS_KEY);
-
-  const expiration = await AsyncStorage.getItem(
-    keys.OAUTH_TOKENS_EXPIRATION_KEY,
-  );
-
-  const oauthTokens = parseJson(res);
-  return {oauthTokens, expiration};
-};
+export const getTokensCache = () => getSession();
 
 /**
  * @name refreshAuthToken
@@ -170,14 +152,13 @@ export const getAuthData = async (config = {}) => {
 
 /**
  * @name clearAuthorizeTokens
- * @description - clear user tokens from async storage
+ * @description - clear user tokens from the session
  * @private
  * @returns {boolean} - true if tokens was cleared, false if some error has ocurred
  */
 export const clearAuthorizeTokens = async () => {
   try {
-    await AsyncStorage.removeItem(keys.OAUTH_TOKENS_KEY);
-    await AsyncStorage.removeItem(keys.OAUTH_TOKENS_EXPIRATION_KEY);
+    await clearSession();
 
     return true;
   } catch (reason) {

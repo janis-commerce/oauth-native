@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 import {refresh, authorize} from 'react-native-app-auth';
 import jwtDecode from 'jwt-decode';
 import {
   storeTokensCache,
   parseExpirationDate,
   isExpired,
-  getTokensCache,
   refreshAuthToken,
   userAuthorize,
   getAuthData,
@@ -18,9 +18,21 @@ import keys from '../../src/keys';
 
 jest.mock('jwt-decode');
 
+const keychainOptions = {service: keys.OAUTH_TOKENS_KEY};
+
+const saveKeychainSession = (session) =>
+  Keychain.setGenericPassword(
+    keys.OAUTH_TOKENS_KEY,
+    JSON.stringify(session),
+    keychainOptions,
+  );
+
+const keychainError = (code) => Object.assign(new Error(code), {code});
+
 describe('OAuth Utils', () => {
-  beforeEach(() => {
-    AsyncStorage.clear();
+  beforeEach(async () => {
+    await clearAuthorizeTokens();
+    await AsyncStorage.clear();
   });
 
   describe('parseExpirationDate', () => {
@@ -47,7 +59,7 @@ describe('OAuth Utils', () => {
   });
 
   describe('storeTokensCache', () => {
-    it('must save tokens data on async storage', async () => {
+    it('must save tokens data and expiration in one keychain entry', async () => {
       const tokensMock = {
         accessTokenExpirationDate: 'Mon Mar 22 2021 20:08:27 GMT-0300',
         tokenType: 'Bearer',
@@ -57,15 +69,18 @@ describe('OAuth Utils', () => {
         idToken: 'id-token-1',
       };
 
-      const stringifiedMock = JSON.stringify(tokensMock);
-
       const res = await storeTokensCache(tokensMock);
 
       expect(res).toBe(true);
-      expect(AsyncStorage.setItem).toBeCalledWith(
+      expect(Keychain.setGenericPassword).toBeCalledWith(
         keys.OAUTH_TOKENS_KEY,
-        stringifiedMock,
+        JSON.stringify({
+          oauthTokens: tokensMock,
+          expiration: String(Date.parse(tokensMock.accessTokenExpirationDate)),
+        }),
+        keychainOptions,
       );
+      expect(AsyncStorage.setItem).not.toBeCalled();
     });
 
     it(`must return error if accessTokenExpirationDate doesn't exists`, async () => {
@@ -84,39 +99,6 @@ describe('OAuth Utils', () => {
       } catch (error) {
         expect(error).not.toBeUndefined();
       }
-    });
-  });
-
-  describe('getTokensCache', () => {
-    it('must get tokens data from async storage', async () => {
-      AsyncStorage.setItem(keys.OAUTH_TOKENS_KEY, JSON.stringify({a: 1, b: 2}));
-      AsyncStorage.setItem(
-        keys.OAUTH_TOKENS_EXPIRATION_KEY,
-        JSON.stringify(12341234),
-      );
-
-      const res = await getTokensCache();
-
-      expect(res).toEqual({
-        expiration: '12341234',
-        oauthTokens: {
-          a: 1,
-          b: 2,
-        },
-      });
-
-      expect(AsyncStorage.getItem).toBeCalledWith(keys.OAUTH_TOKENS_KEY);
-      expect(AsyncStorage.getItem).toBeCalledWith(
-        keys.OAUTH_TOKENS_EXPIRATION_KEY,
-      );
-    });
-
-    it('must return null tokens and expiration if there is nothing on async storage', async () => {
-      const expected = {expiration: null, oauthTokens: null};
-
-      const res = await getTokensCache();
-
-      expect(res).toEqual(expected);
     });
   });
 
@@ -310,15 +292,6 @@ describe('OAuth Utils', () => {
   });
 
   describe('clearAuthorizeTokens', () => {
-    it('must clear async storage expiration and tokens keys', async () => {
-      await clearAuthorizeTokens();
-
-      expect(AsyncStorage.removeItem).toBeCalledWith(keys.OAUTH_TOKENS_KEY);
-      expect(AsyncStorage.removeItem).toBeCalledWith(
-        keys.OAUTH_TOKENS_EXPIRATION_KEY,
-      );
-    });
-
     it('must return true if data was cleared', async () => {
       const res = await clearAuthorizeTokens();
 
@@ -326,9 +299,7 @@ describe('OAuth Utils', () => {
     });
 
     it('must return false', async () => {
-      jest.spyOn(AsyncStorage, 'removeItem').mockImplementation(() => {
-        throw new Error();
-      });
+      Keychain.resetGenericPassword.mockRejectedValueOnce(new Error());
 
       const res = await clearAuthorizeTokens();
 
@@ -338,44 +309,30 @@ describe('OAuth Utils', () => {
 
   describe('isTokenExpired', () => {
     it('should return true if the token is expired', async () => {
-      // Mock getTokensCache to return an expired timestamp
-      AsyncStorage.setItem(
-        keys.OAUTH_TOKENS_EXPIRATION_KEY,
-        JSON.stringify(Date.now() - 1000), // 1 second ago
-      );
+      await saveKeychainSession({expiration: String(Date.now() - 1000)});
       expect(await isTokenExpired()).toBe(true);
     });
 
     it('should return false if the token is not expired', async () => {
-      // Mock getTokensCache to return a future timestamp
-      AsyncStorage.setItem(
-        keys.OAUTH_TOKENS_EXPIRATION_KEY,
-        JSON.stringify(Date.now() + 60000), // 1 minute in the future
-      );
+      await saveKeychainSession({expiration: String(Date.now() + 60000)});
       expect(await isTokenExpired()).toBe(false);
     });
 
     it('should return true if expiration is not set in cache', async () => {
-      // AsyncStorage.getItem will return null for OAUTH_TOKENS_EXPIRATION_KEY
       expect(await isTokenExpired()).toBe(true);
     });
 
     it('should return false if getTokensCache throws an error', async () => {
-      jest
-        .spyOn(AsyncStorage, 'getItem')
-        .mockImplementationOnce(() =>
-          Promise.reject(new Error('AsyncStorage error')),
-        );
+      Keychain.getGenericPassword
+        .mockRejectedValueOnce(keychainError('E_UNKNOWN_ERROR'))
+        .mockRejectedValueOnce(keychainError('E_UNKNOWN_ERROR'));
       expect(await isTokenExpired()).toBe(false);
     });
   });
 
   describe('isUserDev', () => {
     it('should return isDev value from decoded token', async () => {
-      AsyncStorage.setItem(
-        keys.OAUTH_TOKENS_KEY,
-        JSON.stringify({idToken: 'mock.token'}),
-      );
+      await saveKeychainSession({oauthTokens: {idToken: 'mock.token'}});
 
       jwtDecode.mockReturnValue({isDev: true});
       expect(await isUserDev()).toBe(true);
@@ -385,10 +342,7 @@ describe('OAuth Utils', () => {
     });
 
     it('should reject if idToken is missing', async () => {
-      AsyncStorage.setItem(
-        keys.OAUTH_TOKENS_KEY,
-        JSON.stringify({accessToken: 'token'}),
-      );
+      await saveKeychainSession({oauthTokens: {accessToken: 'token'}});
       jwtDecode.mockImplementation(() => {
         throw new Error('Invalid token');
       });
