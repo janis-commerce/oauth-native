@@ -299,7 +299,9 @@ describe('OAuth Utils', () => {
     });
 
     it('must return false', async () => {
-      Keychain.resetGenericPassword.mockRejectedValueOnce(new Error());
+      Keychain.resetGenericPassword
+        .mockRejectedValueOnce(new Error())
+        .mockRejectedValueOnce(new Error());
 
       const res = await clearAuthorizeTokens();
 

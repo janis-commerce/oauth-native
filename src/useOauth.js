@@ -65,8 +65,9 @@ const useOauth = (config = {}, logoutUrl = '') => {
     setLoading(true);
 
     try {
-      await logout(logoutUrl);
+      // Cleared before the browser opens: if the app dies while it is open, the session must already be gone.
       await clearAuthorizeTokens();
+      await logout(logoutUrl);
       setAuthData(initialAuthData);
       setLoading(false);
     } catch (reason) {

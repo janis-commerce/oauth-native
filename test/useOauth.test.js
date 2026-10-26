@@ -75,6 +75,25 @@ describe('useOauth hook', () => {
     expect(browserUtils.logout).toHaveBeenCalled();
   });
 
+  test('must clear the tokens before opening the logout browser', async () => {
+    spyOnJwtDecode.mockReturnValueOnce(() => ({name: 'example'}));
+    const calls = [];
+    jest
+      .spyOn(OAuthUtils, 'clearAuthorizeTokens')
+      .mockImplementation(async () => calls.push('clearAuthorizeTokens'));
+    jest
+      .spyOn(browserUtils, 'logout')
+      .mockImplementation(async () => calls.push('logout'));
+    const {waitForNextUpdate, result} = renderHook(() => useOauth());
+
+    act(() => {
+      result.current.handleLogout();
+    });
+
+    await waitForNextUpdate();
+    expect(calls).toEqual(['clearAuthorizeTokens', 'logout']);
+  });
+
   test('must setError if something failed in handleLogout', async () => {
     spyOnJwtDecode.mockReturnValueOnce(() => ({name: 'example'}));
     jest.spyOn(browserUtils, 'logout').mockImplementation(() => {

@@ -202,5 +202,16 @@ describe('Session', () => {
       ).toBeNull();
       expect(await getSession()).toEqual(emptySession);
     });
+
+    it('must retry a failed keychain reset once', async () => {
+      await setSession(session);
+      Keychain.resetGenericPassword.mockRejectedValueOnce(
+        keychainError('E_CRYPTO_FAILED'),
+      );
+
+      await clearSession();
+
+      expect(await Keychain.getGenericPassword(keychainOptions)).toBe(false);
+    });
   });
 });

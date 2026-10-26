@@ -99,7 +99,10 @@ export const getSession = async () => {
 export const clearSession = async () => {
   session = undefined;
 
-  await Keychain.resetGenericPassword(KEYCHAIN_OPTIONS);
+  // Retried once like the read and write: a leftover entry logs the previous user back in on the next start.
+  await Keychain.resetGenericPassword(KEYCHAIN_OPTIONS).catch(() =>
+    Keychain.resetGenericPassword(KEYCHAIN_OPTIONS),
+  );
   // A failed migration leaves the old session here; it would be migrated back.
   await AsyncStorage.multiRemove(ASYNC_STORAGE_KEYS);
 };
