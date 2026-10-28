@@ -13,7 +13,8 @@ const ASYNC_STORAGE_KEYS = [
 let session;
 // Calls that arrive during that read share it, so the keychain is read and migrated once.
 // A logout during the read is not covered: the read ends later and puts the session back in
-// memory. Accepted to keep this simple: it needs a logout in the first ~270ms of the process.
+// memory, and in the keychain too if it was migrating it. Accepted to keep this simple: it
+// needs a logout in the first ~270ms of the process.
 let pendingRead;
 
 /**
